@@ -1,0 +1,36 @@
+name: Import V7 source tree
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  extract-v7:
+    if: ${{ hashFiles('Restaurant-Burkina-Faso-source-v7-1.zip') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract V7 source
+        run: |
+          set -e
+          unzip -q Restaurant-Burkina-Faso-source-v7-1.zip -d /tmp/restaurant-v7
+          cp -a /tmp/restaurant-v7/. .
+          rm -f Restaurant-Burkina-Faso-source-v7-1.zip
+
+      - name: Commit extracted V7 tree
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No extracted changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: import V7 source into repository tree"
+          git push
