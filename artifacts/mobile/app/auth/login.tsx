@@ -61,7 +61,7 @@ export default function LoginScreen() {
           </View>
           <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>Bon retour !</Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
-            Connectez-vous à votre compte EatBF
+            Connectez-vous à votre compte MON RESTAURANT
           </Text>
         </View>
 
