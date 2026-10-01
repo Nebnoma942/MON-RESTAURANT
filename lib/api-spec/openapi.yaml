@@ -1183,7 +1183,7 @@ components:
           type: string
         paymentMethod:
           type: string
-          enum: [orange_money, moov_money, cash]
+          enum: [orange_money, moov_money]
         loyaltyPointsUsed:
           type: integer
         notes:
@@ -1470,7 +1470,7 @@ components:
           type: string
         paymentMethod:
           type: string
-          enum: [orange_money, moov_money, cash]
+          enum: [orange_money, moov_money]
         itemCount:
           type: integer
         createdAt:
