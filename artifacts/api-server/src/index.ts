@@ -1,4 +1,5 @@
 import express from "express";
+import { randomUUID } from "node:crypto";
 import cors from "cors";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
@@ -111,7 +112,7 @@ app.post("/api/orders",optionalUser,async(req:Req,res)=>{
   if(!user && (!b.guestName||!b.guestPhone)){res.status(400).json({error:"Guest name and phone are required when not logged in"});return;}
   const items=(b.items??[]).map((i:any)=>({dish_id:i.dishId,quantity:i.quantity}));
   const deliveryAddress={address_text:b.deliveryAddress,city:b.deliveryCity,guest_name:b.guestName??null,guest_phone:b.guestPhone??null,latitude:b.deliveryLat??null,longitude:b.deliveryLng??null};
-  const {data,error}=await req.sb!.rpc("create_order",{p_customer_id:user?.id??null,p_guest_name:b.guestName??null,p_guest_phone:b.guestPhone??null,p_restaurant_id:b.restaurantId,p_delivery_zone_id:b.deliveryZoneId??null,p_delivery_address_snapshot:deliveryAddress,p_delivery_location:null,p_items:items,p_payment_method:b.paymentMethod,p_idempotency_key:b.idempotencyKey??crypto.randomUUID(),p_use_loyalty:b.useLoyaltyDiscount===true});
+  const {data,error}=await req.sb!.rpc("create_order",{p_customer_id:user?.id??null,p_guest_name:b.guestName??null,p_guest_phone:b.guestPhone??null,p_restaurant_id:b.restaurantId,p_delivery_zone_id:b.deliveryZoneId??null,p_delivery_address_snapshot:deliveryAddress,p_delivery_location:null,p_items:items,p_payment_method:b.paymentMethod,p_idempotency_key:b.idempotencyKey??randomUUID(),p_use_loyalty:b.useLoyaltyDiscount===true});
   if(error){res.status(400).json({error:error.message});return;}
   const order=Array.isArray(data)?data[0]:data;
   res.status(201).json(order);
