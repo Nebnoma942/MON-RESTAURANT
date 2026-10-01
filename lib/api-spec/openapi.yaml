@@ -450,6 +450,39 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /orders/{id}/payment:
+    patch:
+      operationId: updateOrderPaymentStatus
+      tags: [orders]
+      summary: Record a restaurant payment verification
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderPaymentStatusUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "409":
+          description: Invalid payment transition
+
   # Users
   /users/me:
     patch:
@@ -1173,6 +1206,15 @@ components:
       required:
         - dishId
         - quantity
+
+    OrderPaymentStatusUpdate:
+      type: object
+      properties:
+        paymentStatus:
+          type: string
+          enum: [paid, failed, refunded]
+      required:
+        - paymentStatus
 
     OrderStatusUpdate:
       type: object
