@@ -24,7 +24,6 @@ import { useColors } from "@/hooks/useColors";
 const PAYMENT_METHODS = [
   { id: "orange_money" as const, label: "Orange Money", icon: "smartphone", color: "#FF6600" },
   { id: "moov_money" as const, label: "Moov Money", icon: "smartphone", color: "#0066CC" },
-  { id: "cash" as const, label: "Paiement à la livraison", icon: "truck", color: "#3B7D4F" },
 ];
 
 const PAYMENT_NUMBERS: Record<string, string> = {
@@ -287,15 +286,7 @@ export default function CartScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       cart.clearCart();
 
-      if (paymentMethod === "cash") {
-        Alert.alert(
-          "Commande enregistrée",
-          `Commande #${order.id} enregistrée. Vous paierez ${order.total.toLocaleString()} FCFA à la livraison.`,
-          [{ text: "Suivre la commande", onPress: () => router.replace("/(tabs)/orders" as never) }],
-        );
-      } else {
-        setPendingPayment({ orderId: order.id, amount: order.total, method: paymentMethod });
-      }
+      setPendingPayment({ orderId: order.id, amount: order.total, method: paymentMethod });
     } catch {
       Alert.alert("Erreur", "Impossible de passer la commande. Réessayez.");
     }
