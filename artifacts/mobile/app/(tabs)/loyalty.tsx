@@ -16,7 +16,7 @@ export default function LoyaltyScreen() {
   const { isAuthenticated, user } = useAuth();
 
   const { data: loyalty, isLoading } = useGetLoyalty({
-    query: { enabled: isAuthenticated },
+    query: { queryKey: ["loyalty"], enabled: isAuthenticated },
   });
 
   const topInset = Platform.OS === "web" ? 67 : insets.top;
