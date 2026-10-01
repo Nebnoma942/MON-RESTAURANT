@@ -42,9 +42,22 @@ router.post("/drivers/me", requireAuth, requireDriver, async (req, res) => {
 
 router.patch("/drivers/me/status", requireAuth, requireDriver, async (req, res) => {
   const { isOnline, isAvailable } = req.body as { isOnline?: boolean; isAvailable?: boolean };
+  const [current] = await db.select().from(driversTable).where(eq(driversTable.userId, req.user!.userId));
+  if (!current) {
+    res.status(404).json({ error: "Driver profile not found" });
+    return;
+  }
+
+  const nextOnline = isOnline ?? current.isOnline;
+  const nextAvailable = isOnline === false ? false : (isAvailable ?? current.isAvailable);
+  if (nextAvailable && !nextOnline) {
+    res.status(400).json({ error: "A driver must be online before becoming available" });
+    return;
+  }
+
   const [driver] = await db.update(driversTable).set({
-    ...(isOnline !== undefined && { isOnline }),
-    ...(isAvailable !== undefined && { isAvailable }),
+    isOnline: nextOnline,
+    isAvailable: nextAvailable,
   }).where(eq(driversTable.userId, req.user!.userId)).returning();
   if (!driver) {
     res.status(404).json({ error: "Driver profile not found" });
