@@ -46,6 +46,7 @@ function ClassicTabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
+        tabBarLabelStyle: { fontFamily: "Inter_500Medium", fontSize: 12 },
         tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
           position: "absolute",
@@ -54,6 +55,7 @@ function ClassicTabLayout() {
           borderTopColor: colors.border,
           elevation: 0,
           ...(isWeb ? { height: 84 } : {}),
+          paddingTop: 6,
         },
         tabBarBackground: () =>
           isIOS ? (
