@@ -156,11 +156,7 @@ export default function ProfileScreen() {
                 Se connecter
               </Text>
             </Pressable>
-            <Pressable onPress={() => router.push("/auth/register" as never)}>
-              <Text style={[styles.registerLink, { color: colors.primary, fontFamily: "Inter_500Medium" }]}>
-                Créer un compte
-              </Text>
-            </Pressable>
+            
           </View>
 
           {/* Partner CTA */}
