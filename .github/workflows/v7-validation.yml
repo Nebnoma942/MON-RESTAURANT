@@ -17,6 +17,7 @@ jobs:
       BASE_PATH: "/"
       SESSION_SECRET: "ci-test-secret-change-me-please-32chars"
       CORS_ORIGINS: "http://localhost:4173"
+      EXPO_PUBLIC_DOMAIN: "ci.example.invalid"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
