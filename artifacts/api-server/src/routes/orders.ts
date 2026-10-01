@@ -1,17 +1,17 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { ordersTable, dishesTable, restaurantsTable, usersTable, loyaltyHistoryTable, deliveryAssignmentsTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { requireAuth } from "../lib/auth";
 import { optionalAuth } from "../lib/optional-auth";
 import { calculateDeliveryFee } from "../lib/delivery-fee";
 import { assignNearestAvailableDriver } from "../lib/dispatch";
 import type { OrderItem } from "@workspace/db";
+import { finalizeOrderDelivery, refundOrderLoyaltyDiscount, POINTS_FOR_DISCOUNT, requiresPrepayment } from "../lib/order-lifecycle";
 
 const router: IRouter = Router();
 const POINTS_PER_1000_FCFA = 1;
-const POINTS_FOR_DISCOUNT = 15;
 const DISCOUNT_AMOUNT = 1000;
 const ORDER_STATUSES = ["pending", "confirmed", "preparing", "ready", "delivering", "delivered", "cancelled"] as const;
 type OrderStatus = typeof ORDER_STATUSES[number];
@@ -124,11 +124,7 @@ router.post("/orders", optionalAuth, async (req, res) => {
     ? await db.select().from(usersTable).where(eq(usersTable.id, authenticatedUserId))
     : [undefined];
 
-  let discount = 0;
-  if (customer && body.useLoyaltyDiscount === true && customer.loyaltyPoints >= POINTS_FOR_DISCOUNT) {
-    discount = DISCOUNT_AMOUNT;
-  }
-
+  const discountRequested = customer && body.useLoyaltyDiscount === true && customer.loyaltyPoints >= POINTS_FOR_DISCOUNT;
   const delivery = await calculateDeliveryFee({
     city: deliveryCity,
     restaurantLat: restaurant.lat,
@@ -136,52 +132,75 @@ router.post("/orders", optionalAuth, async (req, res) => {
     customerLat: deliveryLat,
     customerLng: deliveryLng,
   });
-  const total = Math.max(0, subtotal + delivery.fee - discount);
   const pointsEarned = Math.floor(subtotal / 1000) * POINTS_PER_1000_FCFA;
 
-  const [order] = await db.transaction(async (tx) => {
-    if (discount > 0 && authenticatedUserId && customer) {
-      await tx.update(usersTable)
-        .set({ loyaltyPoints: customer.loyaltyPoints - POINTS_FOR_DISCOUNT })
-        .where(eq(usersTable.id, authenticatedUserId));
-      await tx.insert(loyaltyHistoryTable).values({
-        userId: authenticatedUserId,
-        orderId: null,
-        points: -POINTS_FOR_DISCOUNT,
-        description: `Réduction de ${DISCOUNT_AMOUNT.toLocaleString()} FCFA réservée pour une commande`,
-      });
+  try {
+    const [order] = await db.transaction(async (tx) => {
+      let discount = 0;
+
+      if (discountRequested && authenticatedUserId) {
+        const [reserved] = await tx.update(usersTable)
+          .set({ loyaltyPoints: customer!.loyaltyPoints - POINTS_FOR_DISCOUNT })
+          .where(and(
+            eq(usersTable.id, authenticatedUserId),
+            gte(usersTable.loyaltyPoints, POINTS_FOR_DISCOUNT),
+          ))
+          .returning({ id: usersTable.id });
+
+        if (!reserved) {
+          throw new Error("LOYALTY_POINTS_CHANGED");
+        }
+        discount = DISCOUNT_AMOUNT;
+      }
+
+      const total = Math.max(0, subtotal + delivery.fee - discount);
+      const [created] = await tx.insert(ordersTable).values({
+        trackingToken: randomUUID(),
+        customerId: authenticatedUserId ?? null,
+        guestName: guestName?.trim() ?? null,
+        guestPhone: guestPhone?.trim() ?? null,
+        restaurantId,
+        restaurantName: restaurant.name,
+        items: orderItems,
+        status: "pending",
+        subtotal,
+        deliveryFee: delivery.fee,
+        discount,
+        total,
+        deliveryAddress: deliveryAddress.trim(),
+        deliveryCity: deliveryCity.trim(),
+        deliveryLat: deliveryLat ?? null,
+        deliveryLng: deliveryLng ?? null,
+        deliveryZoneId: delivery.zoneId,
+        deliveryDistanceKm: delivery.distanceKm,
+        paymentMethod,
+        paymentStatus: "pending",
+        loyaltyPointsEarned: pointsEarned,
+      }).returning();
+
+      if (!created) throw new Error("Failed to create order");
+
+      if (discount > 0 && authenticatedUserId) {
+        await tx.insert(loyaltyHistoryTable).values({
+          userId: authenticatedUserId,
+          orderId: created.id,
+          points: -POINTS_FOR_DISCOUNT,
+          description: `Réduction de ${DISCOUNT_AMOUNT.toLocaleString()} FCFA utilisée pour la commande #${created.id}`,
+        });
+      }
+
+      await tx.insert(deliveryAssignmentsTable).values({ orderId: created.id, status: "pending" });
+      return [created] as const;
+    });
+
+    res.status(201).json(formatOrder(order));
+  } catch (error) {
+    if (error instanceof Error && error.message === "LOYALTY_POINTS_CHANGED") {
+      res.status(409).json({ error: "Loyalty points changed; please retry the order" });
+      return;
     }
-
-    const [created] = await tx.insert(ordersTable).values({
-      trackingToken: randomUUID(),
-      customerId: authenticatedUserId ?? null,
-      guestName: guestName?.trim() ?? null,
-      guestPhone: guestPhone?.trim() ?? null,
-      restaurantId,
-      restaurantName: restaurant.name,
-      items: orderItems,
-      status: "pending",
-      subtotal,
-      deliveryFee: delivery.fee,
-      discount,
-      total,
-      deliveryAddress: deliveryAddress.trim(),
-      deliveryCity: deliveryCity.trim(),
-      deliveryLat: deliveryLat ?? null,
-      deliveryLng: deliveryLng ?? null,
-      deliveryZoneId: delivery.zoneId,
-      deliveryDistanceKm: delivery.distanceKm,
-      paymentMethod,
-      paymentStatus: "pending",
-      loyaltyPointsEarned: pointsEarned,
-    }).returning();
-
-    if (!created) throw new Error("Failed to create order");
-    await tx.insert(deliveryAssignmentsTable).values({ orderId: created.id, status: "pending" });
-    return [created] as const;
-  });
-
-  res.status(201).json(formatOrder(order));
+    throw error;
+  }
 });
 
 // GET /orders/:id — authenticated users or guests with the tracking token.
@@ -217,6 +236,56 @@ router.get("/orders/:id", optionalAuth, async (req, res) => {
   res.json(formatOrder(order));
 });
 
+// PATCH /orders/:id/payment — restaurant/admin records the payment state.
+router.patch("/orders/:id/payment", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+  const { paymentStatus } = req.body as { paymentStatus?: "paid" | "failed" | "refunded" };
+
+  if (!Number.isInteger(id) || !["paid", "failed", "refunded"].includes(paymentStatus ?? "")) {
+    res.status(400).json({ error: "Invalid payment status" });
+    return;
+  }
+
+  const [order] = await db.select().from(ordersTable).where(eq(ordersTable.id, id));
+  if (!order) {
+    res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  if (req.user!.role !== "admin") {
+    const [restaurant] = await db.select({ ownerId: restaurantsTable.ownerId })
+      .from(restaurantsTable)
+      .where(eq(restaurantsTable.id, order.restaurantId));
+    if (req.user!.role !== "restaurant_owner" || !restaurant || restaurant.ownerId !== req.user!.userId) {
+      res.status(403).json({ error: "Only the restaurant or an admin can update payment status" });
+      return;
+    }
+  }
+
+  const allowed: Record<string, string[]> = {
+    pending: ["paid", "failed"],
+    paid: ["refunded"],
+    failed: ["paid"],
+    refunded: [],
+  };
+  if (!allowed[order.paymentStatus]?.includes(paymentStatus!)) {
+    res.status(409).json({ error: `Invalid payment transition from ${order.paymentStatus} to ${paymentStatus}` });
+    return;
+  }
+
+  const [updated] = await db.update(ordersTable)
+    .set({ paymentStatus: paymentStatus! })
+    .where(eq(ordersTable.id, id))
+    .returning();
+
+  if (!updated) {
+    res.status(409).json({ error: "Payment state changed before this action could be applied" });
+    return;
+  }
+
+  res.json(formatOrder(updated));
+});
+
 // PATCH /orders/:id/status — only the restaurant owner/admin controls restaurant-side status.
 router.patch("/orders/:id/status", requireAuth, async (req, res) => {
   const id = Number(req.params.id);
@@ -245,6 +314,11 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     }
   }
 
+  if (requiresPrepayment(order.paymentMethod) && order.paymentStatus !== "paid" && ["confirmed", "preparing", "ready"].includes(status)) {
+    res.status(409).json({ error: "Mobile-money payment must be confirmed before the restaurant can prepare the order" });
+    return;
+  }
+
   const allowedTransitions: Record<string, string[]> = {
     pending: ["confirmed", "cancelled"],
     confirmed: ["preparing", "cancelled"],
@@ -265,17 +339,16 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     return;
   }
 
-  if (status === "delivered" && order.status !== "delivered" && order.customerId && updated.loyaltyPointsEarned > 0) {
-    const [customer] = await db.select().from(usersTable).where(eq(usersTable.id, order.customerId));
-    if (customer) {
-      await db.update(usersTable).set({ loyaltyPoints: customer.loyaltyPoints + updated.loyaltyPointsEarned }).where(eq(usersTable.id, order.customerId));
-      await db.insert(loyaltyHistoryTable).values({
-        userId: order.customerId,
-        orderId: order.id,
-        points: updated.loyaltyPointsEarned,
-        description: `Points gagnés pour la commande #${order.id}`,
-      });
+  if (status === "delivered") {
+    const finalized = await finalizeOrderDelivery(id);
+    if (finalized) {
+      res.json({ order: formatOrder(finalized), dispatch });
+      return;
     }
+  }
+
+  if (status === "cancelled" && order.status !== "cancelled") {
+    await refundOrderLoyaltyDiscount(id);
   }
 
   // Once the restaurant marks the order ready, dispatch the nearest available driver.
