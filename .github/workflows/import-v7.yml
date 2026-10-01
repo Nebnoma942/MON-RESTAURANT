@@ -1,0 +1,51 @@
+name: Import V7 source
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-v7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Extract V7 ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="Restaurant-Burkina-Faso-source-v7-1.zip"
+          test -f "$ZIP"
+          rm -rf /tmp/v7-import
+          mkdir -p /tmp/v7-import
+          unzip -q "$ZIP" -d /tmp/v7-import
+
+          ROOT="/tmp/v7-import"
+          if [ -d "$ROOT/Restaurant-Burkina-Faso-source-v7" ]; then
+            ROOT="$ROOT/Restaurant-Burkina-Faso-source-v7"
+          fi
+
+          find "$ROOT" -type f -print | wc -l
+          cp -a "$ROOT"/. .
+
+      - name: Commit extracted V7 tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: import V7 source into repository tree"
+          git push origin HEAD:main
