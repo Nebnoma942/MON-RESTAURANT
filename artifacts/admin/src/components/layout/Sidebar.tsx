@@ -27,7 +27,7 @@ export function Sidebar() {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
             BF
           </div>
-          EatBF Admin
+          MON RESTAURANT Admin
         </h1>
       </div>
       
