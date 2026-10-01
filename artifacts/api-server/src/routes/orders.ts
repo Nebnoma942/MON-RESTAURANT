@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { ordersTable, dishesTable, restaurantsTable, usersTable, loyaltyHistoryTable, deliveryAssignmentsTable } from "@workspace/db";
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { requireAuth } from "../lib/auth";
 import { optionalAuth } from "../lib/optional-auth";
@@ -140,7 +140,7 @@ router.post("/orders", optionalAuth, async (req, res) => {
 
       if (discountRequested && authenticatedUserId) {
         const [reserved] = await tx.update(usersTable)
-          .set({ loyaltyPoints: customer!.loyaltyPoints - POINTS_FOR_DISCOUNT })
+          .set({ loyaltyPoints: sql`${usersTable.loyaltyPoints} - ${POINTS_FOR_DISCOUNT}` })
           .where(and(
             eq(usersTable.id, authenticatedUserId),
             gte(usersTable.loyaltyPoints, POINTS_FOR_DISCOUNT),
