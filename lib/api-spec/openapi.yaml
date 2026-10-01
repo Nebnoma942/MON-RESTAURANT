@@ -1106,7 +1106,7 @@ components:
           type: number
         paymentMethod:
           type: string
-          enum: [orange_money, moov_money, cash]
+          enum: [orange_money, moov_money]
         paymentStatus:
           type: string
           enum: [pending, paid, failed, refunded]
