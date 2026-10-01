@@ -11,6 +11,11 @@ const allowedOrigins = process.env["CORS_ORIGINS"]
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const isProduction = process.env["NODE_ENV"] === "production";
+if (isProduction && !allowedOrigins?.length) {
+  throw new Error("CORS_ORIGINS must be configured in production.");
+}
+
 app.use(
   pinoHttp({
     logger,
@@ -33,7 +38,7 @@ app.use(
 
 app.use(
   cors({
-    origin: allowedOrigins?.length ? allowedOrigins : false,
+    origin: isProduction ? allowedOrigins : true,
     credentials: true,
   }),
 );
