@@ -1,5 +1,5 @@
 import { db, ordersTable, usersTable, loyaltyHistoryTable } from "@workspace/db";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 
 export const POINTS_FOR_DISCOUNT = 15;
 
@@ -34,7 +34,7 @@ export async function finalizeOrderDelivery(orderId: number) {
 
       if (customer) {
         await tx.update(usersTable)
-          .set({ loyaltyPoints: customer.loyaltyPoints + updated.loyaltyPointsEarned })
+          .set({ loyaltyPoints: sql`${usersTable.loyaltyPoints} + ${updated.loyaltyPointsEarned}` })
           .where(eq(usersTable.id, updated.customerId));
 
         await tx.insert(loyaltyHistoryTable).values({
@@ -76,7 +76,7 @@ export async function refundOrderLoyaltyDiscount(orderId: number) {
     if (!customer) return false;
 
     await tx.update(usersTable)
-      .set({ loyaltyPoints: customer.loyaltyPoints + POINTS_FOR_DISCOUNT })
+      .set({ loyaltyPoints: sql`${usersTable.loyaltyPoints} + ${POINTS_FOR_DISCOUNT}` })
       .where(eq(usersTable.id, order.customerId));
 
     await tx.insert(loyaltyHistoryTable).values({
