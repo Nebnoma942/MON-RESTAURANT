@@ -23,7 +23,7 @@ export const UserRole = {
 } as const;
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   phone: string;
   /** @nullable */
@@ -77,7 +77,7 @@ export const RestaurantStatus = {
 } as const;
 
 export interface Restaurant {
-  id: number;
+  id: string;
   name: string;
   type: string;
   /** @nullable */
@@ -98,13 +98,13 @@ export interface Restaurant {
   /** @nullable */
   rating?: number | null;
   reviewCount: number;
-  ownerId: number;
+  ownerId: string;
   createdAt: string;
 }
 
 export interface Dish {
-  id: number;
-  restaurantId: number;
+  id: string;
+  restaurantId: string;
   name: string;
   /** @nullable */
   description?: string | null;
@@ -206,7 +206,6 @@ export type OrderPaymentMethod = typeof OrderPaymentMethod[keyof typeof OrderPay
 export const OrderPaymentMethod = {
   orange_money: 'orange_money',
   moov_money: 'moov_money',
-  cash: 'cash',
 } as const;
 
 export type OrderPaymentStatus = typeof OrderPaymentStatus[keyof typeof OrderPaymentStatus];
@@ -220,7 +219,7 @@ export const OrderPaymentStatus = {
 } as const;
 
 export interface OrderItem {
-  dishId: number;
+  dishId: string;
   dishName: string;
   quantity: number;
   unitPrice: number;
@@ -228,9 +227,9 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number;
-  clientId: number;
-  restaurantId: number;
+  id: string;
+  clientId: string;
+  restaurantId: string;
   restaurantName: string;
   status: OrderStatus;
   items: OrderItem[];
@@ -261,17 +260,16 @@ export type OrderInputPaymentMethod = typeof OrderInputPaymentMethod[keyof typeo
 export const OrderInputPaymentMethod = {
   orange_money: 'orange_money',
   moov_money: 'moov_money',
-  cash: 'cash',
 } as const;
 
 export interface OrderItemInput {
-  dishId: number;
+  dishId: string;
   /** @minimum 1 */
   quantity: number;
 }
 
 export interface OrderInput {
-  restaurantId: number;
+  restaurantId: string;
   /** @minItems 1 */
   items: OrderItemInput[];
   deliveryAddress: string;
@@ -303,7 +301,7 @@ export interface OrderStatusUpdate {
 }
 
 export interface LoyaltyEntry {
-  id: number;
+  id: string;
   points: number;
   description: string;
   createdAt: string;
@@ -317,7 +315,7 @@ export interface LoyaltyInfo {
 }
 
 export interface Address {
-  id: number;
+  id: string;
   label: string;
   address: string;
   city: string;
@@ -382,7 +380,7 @@ export const AdminRestaurantStatus = {
 } as const;
 
 export interface AdminRestaurant {
-  id: number;
+  id: string;
   name: string;
   type: string;
   city: string;
@@ -393,7 +391,7 @@ export interface AdminRestaurant {
   /** @nullable */
   rating?: number | null;
   reviewCount: number;
-  ownerId: number;
+  ownerId: string;
   /** @nullable */
   ownerName?: string | null;
   /** @nullable */
@@ -424,7 +422,7 @@ export const RestaurantStatusResultStatus = {
 } as const;
 
 export interface RestaurantStatusResult {
-  id: number;
+  id: string;
   status: RestaurantStatusResultStatus;
 }
 
@@ -438,7 +436,7 @@ export const AdminUserRole = {
 } as const;
 
 export interface AdminUser {
-  id: number;
+  id: string;
   name: string;
   phone: string;
   /** @nullable */
@@ -471,7 +469,7 @@ export const UserRoleResultRole = {
 } as const;
 
 export interface UserRoleResult {
-  id: number;
+  id: string;
   role: UserRoleResultRole;
 }
 
@@ -494,13 +492,12 @@ export type AdminOrderPaymentMethod = typeof AdminOrderPaymentMethod[keyof typeo
 export const AdminOrderPaymentMethod = {
   orange_money: 'orange_money',
   moov_money: 'moov_money',
-  cash: 'cash',
 } as const;
 
 export interface AdminOrder {
-  id: number;
-  customerId: number;
-  restaurantId: number;
+  id: string;
+  customerId: string;
+  restaurantId: string;
   restaurantName: string;
   status: AdminOrderStatus;
   subtotal: number;
