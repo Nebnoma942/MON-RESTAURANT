@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "EatBF Livreur",
-    "slug": "eatbf-driver",
+    "name": "MON RESTAURANT Livreur",
+    "slug": "mon-restaurant-driver",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,10 +15,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.eatbf.client"
+      "bundleIdentifier": "com.monrestaurant.client"
     },
     "android": {
-      "package": "com.eatbf.client",
+      "package": "com.monrestaurant.client",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
