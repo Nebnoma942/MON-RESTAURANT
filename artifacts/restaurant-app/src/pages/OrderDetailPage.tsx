@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetOrder, useUpdateOrderStatus, useGetMyRestaurant, OrderStatusUpdateStatus } from "@workspace/api-client-react";
+import { useAuth } from "../contexts/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { customFetch } from "@workspace/api-client-react";
 import { ArrowLeft, MapPin, Clock, Package, CheckCircle2, ChefHat, Timer, Zap } from "lucide-react";
 import { useLocation, useParams } from "wouter";
 
@@ -218,6 +218,7 @@ export default function OrderDetailPage() {
   const queryClient = useQueryClient();
   const [showPrepDialog, setShowPrepDialog] = useState(false);
   const [paymentBusy, setPaymentBusy] = useState(false);
+  const { token } = useAuth();
 
   const orderId = parseInt(id ?? "0");
   const { data: order, isLoading } = useGetOrder(orderId, {
@@ -237,11 +238,19 @@ export default function OrderDetailPage() {
   const handlePaymentStatus = async (paymentStatus: "paid" | "failed") => {
     try {
       setPaymentBusy(true);
-      await customFetch(`/orders/${orderId}/payment`, {
+      if (!token) throw new Error("Session restaurant expirée");
+      const response = await fetch(`/api/orders/${orderId}/payment`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ paymentStatus }),
-        responseType: "json",
       });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.error ?? "Impossible de mettre à jour le paiement");
+      }
       await queryClient.invalidateQueries({ queryKey: ["/api/orders", orderId] });
       await queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
     } catch (error) {
@@ -446,7 +455,6 @@ export default function OrderDetailPage() {
           <button
             onClick={handleAccept}
             disabled={updateStatus.isPending || paymentBusy || ((order.paymentMethod === "orange_money" || order.paymentMethod === "moov_money") && order.paymentStatus !== "paid")}
-            disabled={updateStatus.isPending}
             className="w-full py-3.5 bg-green-500 text-white rounded-xl font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4" />
