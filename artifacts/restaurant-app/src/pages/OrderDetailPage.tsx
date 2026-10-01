@@ -220,8 +220,8 @@ export default function OrderDetailPage() {
   const [paymentBusy, setPaymentBusy] = useState(false);
   const { token } = useAuth();
 
-  const orderId = parseInt(id ?? "0");
-  const { data: order, isLoading } = useGetOrder(orderId, {
+  const orderId = id ?? "";
+  const { data: order, isLoading } = useGetOrder(orderId as any, {
     query: { queryKey: ["order", orderId], refetchInterval: 10000 },
   });
   const { data: restaurant } = useGetMyRestaurant();
