@@ -25,7 +25,7 @@ export default function OrdersScreen() {
   const { isAuthenticated } = useAuth();
 
   const { data: orders, isLoading, refetch, isRefetching } = useListOrders({
-    query: { enabled: isAuthenticated },
+    query: { queryKey: ["orders"], enabled: isAuthenticated },
   });
 
   const topInset = Platform.OS === "web" ? 67 : insets.top;
