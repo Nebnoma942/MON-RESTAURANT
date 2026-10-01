@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetOrder, useUpdateOrderStatus, useGetMyRestaurant, OrderStatusUpdateStatus } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { customFetch } from "@workspace/api-client-react";
 import { ArrowLeft, MapPin, Clock, Package, CheckCircle2, ChefHat, Timer, Zap } from "lucide-react";
 import { useLocation, useParams } from "wouter";
 
@@ -216,6 +217,7 @@ export default function OrderDetailPage() {
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const [showPrepDialog, setShowPrepDialog] = useState(false);
+  const [paymentBusy, setPaymentBusy] = useState(false);
 
   const orderId = parseInt(id ?? "0");
   const { data: order, isLoading } = useGetOrder(orderId, {
@@ -231,6 +233,23 @@ export default function OrderDetailPage() {
       },
     },
   });
+
+  const handlePaymentStatus = async (paymentStatus: "paid" | "failed") => {
+    try {
+      setPaymentBusy(true);
+      await customFetch(`/orders/${orderId}/payment`, {
+        method: "PATCH",
+        body: JSON.stringify({ paymentStatus }),
+        responseType: "json",
+      });
+      await queryClient.invalidateQueries({ queryKey: ["/api/orders", orderId] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Impossible de mettre à jour le paiement");
+    } finally {
+      setPaymentBusy(false);
+    }
+  };
 
   const handleAccept = () => {
     updateStatus.mutate({ id: orderId, data: { status: OrderStatusUpdateStatus.confirmed } });
@@ -373,6 +392,41 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
+        {/* Payment verification */}
+        {(order.paymentMethod === "orange_money" || order.paymentMethod === "moov_money") && (
+          <div className="bg-card rounded-2xl border border-card-border p-4">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <div>
+                <p className="font-medium text-sm text-foreground">Vérification du paiement</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Statut : {order.paymentStatus === "paid" ? "Paiement reçu" : order.paymentStatus === "failed" ? "Paiement échoué" : "En attente de confirmation"}
+                </p>
+              </div>
+              <span className={`text-xs px-2 py-1 rounded-full ${order.paymentStatus === "paid" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                {order.paymentStatus === "paid" ? "Payé" : order.paymentStatus === "failed" ? "Échec" : "À vérifier"}
+              </span>
+            </div>
+            {order.paymentStatus === "pending" && (
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <button
+                  onClick={() => handlePaymentStatus("paid")}
+                  disabled={paymentBusy}
+                  className="py-2.5 bg-green-500 text-white rounded-xl font-semibold text-sm disabled:opacity-60"
+                >
+                  Paiement reçu
+                </button>
+                <button
+                  onClick={() => handlePaymentStatus("failed")}
+                  disabled={paymentBusy}
+                  className="py-2.5 border border-destructive/30 text-destructive rounded-xl font-semibold text-sm disabled:opacity-60"
+                >
+                  Paiement non reçu
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Restaurant info */}
         {restaurant && (
           <div className="bg-card rounded-2xl border border-card-border p-4">
@@ -391,6 +445,7 @@ export default function OrderDetailPage() {
         {order.status === "pending" && (
           <button
             onClick={handleAccept}
+            disabled={updateStatus.isPending || paymentBusy || ((order.paymentMethod === "orange_money" || order.paymentMethod === "moov_money") && order.paymentStatus !== "paid")}
             disabled={updateStatus.isPending}
             className="w-full py-3.5 bg-green-500 text-white rounded-xl font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2"
           >
