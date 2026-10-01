@@ -16,7 +16,7 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   
   // We use this to show alert badges on nav items if needed
-  const { data: stats } = useGetAdminStats({ query: { staleTime: 60000 } });
+  const { data: stats } = useGetAdminStats({ query: { queryKey: ["admin-stats"], staleTime: 60000 } });
   
   const pendingRestaurants = stats?.restaurants?.pending || 0;
 
