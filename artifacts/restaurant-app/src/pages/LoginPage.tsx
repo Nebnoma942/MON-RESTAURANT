@@ -16,6 +16,7 @@ export default function LoginPage() {
   const loginMutation = useLoginUser({
     mutation: {
       onSuccess: (data) => {
+        if (data.user.role !== "restaurant_owner") { setError("Accès réservé aux comptes restaurateur"); return; }
         login(data.token, data.user);
         navigate("/");
       },
