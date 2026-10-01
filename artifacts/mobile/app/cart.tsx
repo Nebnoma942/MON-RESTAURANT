@@ -28,8 +28,8 @@ const PAYMENT_METHODS = [
 ];
 
 const PAYMENT_NUMBERS: Record<string, string> = {
-  orange_money: "+226 07 00 00 00",
-  moov_money: "+226 01 00 00 00",
+  orange_money: process.env.EXPO_PUBLIC_ORANGE_MONEY_NUMBER || "Numéro Orange Money de la plateforme",
+  moov_money: process.env.EXPO_PUBLIC_MOOV_MONEY_NUMBER || "Numéro Moov Money de la plateforme",
 };
 
 interface PaymentInstructionProps {
