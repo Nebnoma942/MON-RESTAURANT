@@ -6,17 +6,38 @@ import { eq } from "drizzle-orm";
 import { signToken, requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
+const PUBLIC_REGISTRATION_ROLES = ["client", "restaurant_owner"] as const;
+type PublicRegistrationRole = typeof PUBLIC_REGISTRATION_ROLES[number];
 
 router.post("/auth/register", async (req, res) => {
   const { name, phone, email, password, role } = req.body as {
-    name: string;
-    phone: string;
-    email?: string;
-    password: string;
-    role: "client" | "restaurant_owner" | "driver";
+    name?: unknown;
+    phone?: unknown;
+    email?: unknown;
+    password?: unknown;
+    role?: unknown;
   };
 
-  if (!name || !phone || !password || !role) {
+  if (
+    typeof name !== "string" ||
+    typeof phone !== "string" ||
+    typeof password !== "string" ||
+    typeof role !== "string"
+  ) {
+    res.status(400).json({ error: "Invalid registration payload" });
+    return;
+  }
+
+  if (!PUBLIC_REGISTRATION_ROLES.includes(role as PublicRegistrationRole)) {
+    res.status(400).json({ error: "Invalid registration role" });
+    return;
+  }
+
+  const normalizedName = name.trim();
+  const normalizedPhone = phone.trim();
+  const normalizedEmail = typeof email === "string" ? email.trim() : null;
+
+  if (!normalizedName || !normalizedPhone || !password) {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
@@ -25,22 +46,24 @@ router.post("/auth/register", async (req, res) => {
     return;
   }
 
-  const existing = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.phone, phone));
+  const existing = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.phone, normalizedPhone));
   if (existing.length > 0) {
     res.status(409).json({ error: "Phone number already registered" });
     return;
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const [user] = await db.insert(usersTable).values({ name, phone, email: email || null, passwordHash, role }).returning();
+  const [user] = await db.insert(usersTable).values({
+    name: normalizedName,
+    phone: normalizedPhone,
+    email: normalizedEmail,
+    passwordHash,
+    role: role as PublicRegistrationRole,
+  }).returning();
 
   if (!user) {
     res.status(500).json({ error: "Failed to create user" });
     return;
-  }
-
-  if (user.role === "driver") {
-    await db.insert(driversTable).values({ userId: user.id });
   }
 
   const token = signToken({ userId: user.id, role: user.role });
@@ -59,14 +82,14 @@ router.post("/auth/register", async (req, res) => {
 });
 
 router.post("/auth/login", async (req, res) => {
-  const { phone, password } = req.body as { phone: string; password: string };
+  const { phone, password } = req.body as { phone?: unknown; password?: unknown };
 
-  if (!phone || !password) {
+  if (typeof phone !== "string" || typeof password !== "string" || !phone.trim() || !password) {
     res.status(400).json({ error: "Missing phone or password" });
     return;
   }
 
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.phone, phone));
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.phone, phone.trim()));
   if (!user) {
     res.status(401).json({ error: "Invalid credentials" });
     return;
