@@ -28,10 +28,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem("eatbf_admin_token");
     const storedUser = localStorage.getItem("eatbf_admin_user");
-    if (stored && storedUser) {
+    if (!stored || !storedUser) return;
+
+    try {
+      const parsed = JSON.parse(storedUser) as User;
+      if (!parsed || typeof parsed !== "object" || !parsed.id || !parsed.role) {
+        throw new Error("Invalid stored user");
+      }
       setTokenState(stored);
-      setUser(JSON.parse(storedUser));
+      setUser(parsed);
       setAuthTokenGetter(() => stored);
+    } catch {
+      localStorage.removeItem("eatbf_admin_token");
+      localStorage.removeItem("eatbf_admin_user");
+      setAuthTokenGetter(null);
     }
   }, []);
 
