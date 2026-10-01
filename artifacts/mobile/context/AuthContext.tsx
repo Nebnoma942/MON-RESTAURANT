@@ -27,8 +27,8 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const TOKEN_KEY = "eatbf_token";
-const USER_KEY = "eatbf_user";
+const TOKEN_KEY = "mon_restaurant_token";
+const USER_KEY = "mon_restaurant_user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
