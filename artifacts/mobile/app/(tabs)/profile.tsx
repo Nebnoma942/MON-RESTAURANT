@@ -143,7 +143,7 @@ export default function ProfileScreen() {
               <Feather name="user" size={32} color={colors.mutedForeground} />
             </View>
             <Text style={[styles.guestTitle, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>
-              Rejoignez EatBF
+              Rejoignez MON RESTAURANT
             </Text>
             <Text style={[styles.guestSub, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
               Créez un compte pour accéder à votre historique de commandes, programme de fidélité et plus encore.
