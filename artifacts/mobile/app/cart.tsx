@@ -139,7 +139,7 @@ export default function CartScreen() {
 
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("Ouagadougou");
-  const [paymentMethod, setPaymentMethod] = useState<"orange_money" | "moov_money" | "cash">("orange_money");
+  const [paymentMethod, setPaymentMethod] = useState<"orange_money" | "moov_money">("orange_money");
   const [pendingPayment, setPendingPayment] = useState<{ orderId: number; amount: number; method: "orange_money" | "moov_money" } | null>(null);
   const [deliveryFee, setDeliveryFee] = useState<number | null>(null);
   const [deliveryDistanceKm, setDeliveryDistanceKm] = useState<number | null>(null);
