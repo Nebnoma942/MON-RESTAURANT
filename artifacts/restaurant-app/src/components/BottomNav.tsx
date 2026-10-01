@@ -12,7 +12,7 @@ export default function BottomNav() {
   const [location, navigate] = useLocation();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border z-40">
+    <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border z-40 md:max-w-3xl md:mx-auto">
       <div className="flex items-center justify-around px-2 pt-2 pb-safe">
         {TABS.map(({ path, label, Icon }) => {
           const active = path === "/" ? location === "/" : location.startsWith(path);
@@ -20,7 +20,7 @@ export default function BottomNav() {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
+              className={`flex flex-col items-center justify-center gap-0.5 min-w-[72px] min-h-11 px-3 py-2 rounded-xl transition-colors ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
             >
