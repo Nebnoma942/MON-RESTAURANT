@@ -319,7 +319,7 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     }
   }
 
-  if (requiresPrepayment(order.paymentMethod) && order.paymentStatus !== "paid" && ["confirmed", "preparing", "ready"].includes(status)) {
+  if (requiresPrepayment(order.paymentMethod) && order.paymentStatus !== "paid" && ["confirmed", "preparing", "ready"].includes(status ?? "")) {
     res.status(409).json({ error: "Mobile-money payment must be confirmed before the restaurant can prepare the order" });
     return;
   }
