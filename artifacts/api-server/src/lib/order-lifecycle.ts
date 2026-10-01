@@ -68,9 +68,6 @@ export async function refundOrderLoyaltyDiscount(orderId: number) {
 
     if (existingRefund.length > 0) return false;
 
-    await tx.update(usersTable)
-      .set({ loyaltyPoints: tx.$count(usersTable, eq(usersTable.id, order.customerId)) as any })
-      .where(eq(usersTable.id, order.customerId));
 
     const [customer] = await tx.select({ loyaltyPoints: usersTable.loyaltyPoints })
       .from(usersTable)
