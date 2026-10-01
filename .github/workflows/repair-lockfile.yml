@@ -28,6 +28,16 @@ jobs:
       - name: Regenerate lockfile if needed
         run: pnpm install --no-frozen-lockfile
 
+      - name: Validate synchronized workspace
+        env:
+          PORT: "4173"
+          BASE_PATH: "/"
+          SESSION_SECRET: "ci-test-secret-change-me-please-32chars"
+          CORS_ORIGINS: "http://localhost:4173"
+        run: |
+          pnpm run typecheck
+          pnpm run build
+
       - name: Commit lockfile repair
         run: |
           if git diff --quiet -- pnpm-lock.yaml; then
