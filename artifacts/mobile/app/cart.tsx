@@ -200,11 +200,13 @@ export default function CartScreen() {
           params.set("lng", String(coords.lng));
         }
 
-        const quote = await customFetch<{
+        const response = await fetch(`/api/delivery/quote?${params.toString()}`);
+        if (!response.ok) throw new Error("Unable to calculate delivery fee");
+        const quote = await response.json() as {
           fee: number;
           distanceKm: number | null;
           zoneName: string | null;
-        }>(`/delivery/quote?${params.toString()}`, { responseType: "json" });
+        };
 
         if (!cancelled) {
           setDeliveryFee(quote.fee);
