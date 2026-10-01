@@ -36,14 +36,14 @@ export function CartButton() {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: Platform.OS === "web" ? 34 + 10 : 10,
+    bottom: Platform.OS === "web" ? 34 + 10 : 12,
     left: 16,
     right: 16,
-    borderRadius: 16,
+    borderRadius: 18,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 14,
+    paddingVertical: 15,
     paddingHorizontal: 18,
     ...Platform.select({
       ios: { shadowColor: "#E85D04", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12 },
