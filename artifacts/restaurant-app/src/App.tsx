@@ -31,8 +31,8 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto relative">
-      <div className={isAuthenticated ? "pb-16" : ""}>
+    <div className="min-h-screen bg-background w-full max-w-3xl mx-auto relative md:border-x md:border-border/60">
+      <div className={isAuthenticated ? "pb-20 md:pb-6" : ""}>
         {children}
       </div>
       {isAuthenticated && <BottomNav />}
