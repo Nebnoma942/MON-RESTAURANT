@@ -1,7 +1,11 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 
-const SECRET = process.env["SESSION_SECRET"] ?? "dev-secret-change-me";
+const SECRET = process.env["SESSION_SECRET"];
+
+if (!SECRET || SECRET.length < 32) {
+  throw new Error("SESSION_SECRET must be set and contain at least 32 characters.");
+}
 
 export interface JwtPayload {
   userId: number;
@@ -30,7 +34,11 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  const token = authHeader.slice(7);
+  const token = authHeader.slice(7).trim();
+  if (!token) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   try {
     req.user = verifyToken(token);
     next();
