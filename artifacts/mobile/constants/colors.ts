@@ -1,39 +1,57 @@
 const colors = {
   light: {
-    text: "#1a1a1a",
+    text: "#1A1A1A",
     tint: "#E85D04",
-
     background: "#FAFAF8",
-    foreground: "#1a1a1a",
-
+    foreground: "#1A1A1A",
     card: "#FFFFFF",
-    cardForeground: "#1a1a1a",
-
+    cardForeground: "#1A1A1A",
     primary: "#E85D04",
     primaryForeground: "#FFFFFF",
-
-    secondary: "#FFF3E0",
-    secondaryForeground: "#E85D04",
-
-    muted: "#F5F5F0",
-    mutedForeground: "#888880",
-
+    secondary: "#FFF0E7",
+    secondaryForeground: "#B94300",
+    muted: "#F3F2ED",
+    mutedForeground: "#6F6F68",
     accent: "#FF8C42",
     accentForeground: "#FFFFFF",
-
     destructive: "#DC2626",
     destructiveForeground: "#FFFFFF",
-
-    border: "#EBEBEB",
-    input: "#F0F0EC",
-
+    border: "#E7E5DF",
+    input: "#F5F4EF",
     success: "#16A34A",
     successForeground: "#FFFFFF",
-
-    warning: "#F59E0B",
+    warning: "#D97706",
     warningForeground: "#FFFFFF",
-
+    info: "#2563EB",
+    infoForeground: "#FFFFFF",
     overlay: "rgba(0,0,0,0.5)",
+  },
+  dark: {
+    text: "#F7F5F0",
+    tint: "#FF8C42",
+    background: "#171310",
+    foreground: "#F7F5F0",
+    card: "#211B17",
+    cardForeground: "#F7F5F0",
+    primary: "#FF8C42",
+    primaryForeground: "#2A160B",
+    secondary: "#3A2418",
+    secondaryForeground: "#FFB27D",
+    muted: "#2A231E",
+    mutedForeground: "#B7AEA5",
+    accent: "#FF9B58",
+    accentForeground: "#2A160B",
+    destructive: "#F87171",
+    destructiveForeground: "#2A0B0B",
+    border: "#3A312A",
+    input: "#2A231E",
+    success: "#4ADE80",
+    successForeground: "#0B2412",
+    warning: "#F59E0B",
+    warningForeground: "#2A1700",
+    info: "#60A5FA",
+    infoForeground: "#0B172A",
+    overlay: "rgba(0,0,0,0.65)",
   },
   radius: 12,
 };
