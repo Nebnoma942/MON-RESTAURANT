@@ -110,20 +110,6 @@ export default function LoginScreen() {
             </Text>
           </Pressable>
 
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-            <Text style={[styles.dividerText, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>ou</Text>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-          </View>
-
-          <Pressable
-            style={[styles.registerBtn, { borderColor: colors.border }]}
-            onPress={() => router.replace("/auth/register" as never)}
-          >
-            <Text style={[styles.registerBtnText, { color: colors.foreground, fontFamily: "Inter_600SemiBold" }]}>
-              Créer un compte
-            </Text>
-          </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
