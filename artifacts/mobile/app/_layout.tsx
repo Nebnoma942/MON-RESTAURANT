@@ -29,7 +29,6 @@ function RootLayoutNav() {
       <Stack.Screen name="cart" options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="order/[id]" options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="auth/login" options={{ headerShown: false, presentation: "modal" }} />
-      <Stack.Screen name="auth/register" options={{ headerShown: false, presentation: "modal" }} />
       <Stack.Screen name="onboarding/restaurant" options={{ headerShown: false, presentation: "card" }} />
       <Stack.Screen name="onboarding/driver" options={{ headerShown: false, presentation: "card" }} />
     </Stack>
