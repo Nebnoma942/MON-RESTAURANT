@@ -219,7 +219,7 @@ export default function OrderDetailPage() {
 
   const orderId = parseInt(id ?? "0");
   const { data: order, isLoading } = useGetOrder(orderId, {
-    query: { refetchInterval: 10000 },
+    query: { queryKey: ["order", orderId], refetchInterval: 10000 },
   });
   const { data: restaurant } = useGetMyRestaurant();
 
