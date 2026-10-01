@@ -507,7 +507,7 @@ export const useCreateRestaurant = <TError = ErrorType<ErrorResponse>,
       return useMutation(getCreateRestaurantMutationOptions(options));
     }
 
-export const getGetRestaurantUrl = (id: number,) => {
+export const getGetRestaurantUrl = (id: string,) => {
 
 
 
@@ -518,7 +518,7 @@ export const getGetRestaurantUrl = (id: number,) => {
 /**
  * @summary Get restaurant details with menu
  */
-export const getRestaurant = async (id: number, options?: RequestInit): Promise<RestaurantDetail> => {
+export const getRestaurant = async (id: string, options?: RequestInit): Promise<RestaurantDetail> => {
 
   return customFetch<RestaurantDetail>(getGetRestaurantUrl(id),
   {
@@ -533,14 +533,14 @@ export const getRestaurant = async (id: number, options?: RequestInit): Promise<
 
 
 
-export const getGetRestaurantQueryKey = (id: number,) => {
+export const getGetRestaurantQueryKey = (id: string,) => {
     return [
     `/api/restaurants/${id}`
     ] as const;
     }
 
 
-export const getGetRestaurantQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurant>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurant>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetRestaurantQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurant>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurant>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -567,7 +567,7 @@ export type GetRestaurantQueryError = ErrorType<ErrorResponse>
  */
 
 export function useGetRestaurant<TData = Awaited<ReturnType<typeof getRestaurant>>, TError = ErrorType<ErrorResponse>>(
- id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurant>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurant>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -584,7 +584,7 @@ export function useGetRestaurant<TData = Awaited<ReturnType<typeof getRestaurant
 
 
 
-export const getUpdateRestaurantUrl = (id: number,) => {
+export const getUpdateRestaurantUrl = (id: string,) => {
 
 
 
@@ -595,7 +595,7 @@ export const getUpdateRestaurantUrl = (id: number,) => {
 /**
  * @summary Update restaurant info
  */
-export const updateRestaurant = async (id: number,
+export const updateRestaurant = async (id: string,
     restaurantUpdate: RestaurantUpdate, options?: RequestInit): Promise<Restaurant> => {
 
   return customFetch<Restaurant>(getUpdateRestaurantUrl(id),
@@ -612,8 +612,8 @@ export const updateRestaurant = async (id: number,
 
 
 export const getUpdateRestaurantMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: number;data: BodyType<RestaurantUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: number;data: BodyType<RestaurantUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: string;data: BodyType<RestaurantUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: string;data: BodyType<RestaurantUpdate>}, TContext> => {
 
 const mutationKey = ['updateRestaurant'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -625,7 +625,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRestaurant>>, {id: number;data: BodyType<RestaurantUpdate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRestaurant>>, {id: string;data: BodyType<RestaurantUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateRestaurant(id,data,requestOptions)
@@ -646,11 +646,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update restaurant info
  */
 export const useUpdateRestaurant = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: number;data: BodyType<RestaurantUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRestaurant>>, TError,{id: string;data: BodyType<RestaurantUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateRestaurant>>,
         TError,
-        {id: number;data: BodyType<RestaurantUpdate>},
+        {id: string;data: BodyType<RestaurantUpdate>},
         TContext
       > => {
       return useMutation(getUpdateRestaurantMutationOptions(options));
@@ -733,7 +733,7 @@ export function useGetMyRestaurant<TData = Awaited<ReturnType<typeof getMyRestau
 
 
 
-export const getGetRestaurantDishesUrl = (restaurantId: number,) => {
+export const getGetRestaurantDishesUrl = (restaurantId: string,) => {
 
 
 
@@ -744,7 +744,7 @@ export const getGetRestaurantDishesUrl = (restaurantId: number,) => {
 /**
  * @summary List dishes for a restaurant
  */
-export const getRestaurantDishes = async (restaurantId: number, options?: RequestInit): Promise<Dish[]> => {
+export const getRestaurantDishes = async (restaurantId: string, options?: RequestInit): Promise<Dish[]> => {
 
   return customFetch<Dish[]>(getGetRestaurantDishesUrl(restaurantId),
   {
@@ -759,14 +759,14 @@ export const getRestaurantDishes = async (restaurantId: number, options?: Reques
 
 
 
-export const getGetRestaurantDishesQueryKey = (restaurantId: number,) => {
+export const getGetRestaurantDishesQueryKey = (restaurantId: string,) => {
     return [
     `/api/restaurants/${restaurantId}/dishes`
     ] as const;
     }
 
 
-export const getGetRestaurantDishesQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurantDishes>>, TError = ErrorType<unknown>>(restaurantId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantDishes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetRestaurantDishesQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurantDishes>>, TError = ErrorType<unknown>>(restaurantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantDishes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -793,7 +793,7 @@ export type GetRestaurantDishesQueryError = ErrorType<unknown>
  */
 
 export function useGetRestaurantDishes<TData = Awaited<ReturnType<typeof getRestaurantDishes>>, TError = ErrorType<unknown>>(
- restaurantId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantDishes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ restaurantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantDishes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -810,7 +810,7 @@ export function useGetRestaurantDishes<TData = Awaited<ReturnType<typeof getRest
 
 
 
-export const getCreateDishUrl = (restaurantId: number,) => {
+export const getCreateDishUrl = (restaurantId: string,) => {
 
 
 
@@ -821,7 +821,7 @@ export const getCreateDishUrl = (restaurantId: number,) => {
 /**
  * @summary Add a dish to the menu
  */
-export const createDish = async (restaurantId: number,
+export const createDish = async (restaurantId: string,
     dishInput: DishInput, options?: RequestInit): Promise<Dish> => {
 
   return customFetch<Dish>(getCreateDishUrl(restaurantId),
@@ -838,8 +838,8 @@ export const createDish = async (restaurantId: number,
 
 
 export const getCreateDishMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: number;data: BodyType<DishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: number;data: BodyType<DishInput>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: string;data: BodyType<DishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: string;data: BodyType<DishInput>}, TContext> => {
 
 const mutationKey = ['createDish'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -851,7 +851,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDish>>, {restaurantId: number;data: BodyType<DishInput>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createDish>>, {restaurantId: string;data: BodyType<DishInput>}> = (props) => {
           const {restaurantId,data} = props ?? {};
 
           return  createDish(restaurantId,data,requestOptions)
@@ -872,18 +872,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Add a dish to the menu
  */
 export const useCreateDish = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: number;data: BodyType<DishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDish>>, TError,{restaurantId: string;data: BodyType<DishInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createDish>>,
         TError,
-        {restaurantId: number;data: BodyType<DishInput>},
+        {restaurantId: string;data: BodyType<DishInput>},
         TContext
       > => {
       return useMutation(getCreateDishMutationOptions(options));
     }
 
-export const getUpdateDishUrl = (restaurantId: number,
-    dishId: number,) => {
+export const getUpdateDishUrl = (restaurantId: string,
+    dishId: string,) => {
 
 
 
@@ -894,8 +894,8 @@ export const getUpdateDishUrl = (restaurantId: number,
 /**
  * @summary Update a dish
  */
-export const updateDish = async (restaurantId: number,
-    dishId: number,
+export const updateDish = async (restaurantId: string,
+    dishId: string,
     dishUpdate: DishUpdate, options?: RequestInit): Promise<Dish> => {
 
   return customFetch<Dish>(getUpdateDishUrl(restaurantId,dishId),
@@ -912,8 +912,8 @@ export const updateDish = async (restaurantId: number,
 
 
 export const getUpdateDishMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: number;dishId: number;data: BodyType<DishUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: number;dishId: number;data: BodyType<DishUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: string;dishId: string;data: BodyType<DishUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: string;dishId: string;data: BodyType<DishUpdate>}, TContext> => {
 
 const mutationKey = ['updateDish'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -925,7 +925,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDish>>, {restaurantId: number;dishId: number;data: BodyType<DishUpdate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateDish>>, {restaurantId: string;dishId: string;data: BodyType<DishUpdate>}> = (props) => {
           const {restaurantId,dishId,data} = props ?? {};
 
           return  updateDish(restaurantId,dishId,data,requestOptions)
@@ -946,18 +946,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update a dish
  */
 export const useUpdateDish = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: number;dishId: number;data: BodyType<DishUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDish>>, TError,{restaurantId: string;dishId: string;data: BodyType<DishUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateDish>>,
         TError,
-        {restaurantId: number;dishId: number;data: BodyType<DishUpdate>},
+        {restaurantId: string;dishId: string;data: BodyType<DishUpdate>},
         TContext
       > => {
       return useMutation(getUpdateDishMutationOptions(options));
     }
 
-export const getDeleteDishUrl = (restaurantId: number,
-    dishId: number,) => {
+export const getDeleteDishUrl = (restaurantId: string,
+    dishId: string,) => {
 
 
 
@@ -968,8 +968,8 @@ export const getDeleteDishUrl = (restaurantId: number,
 /**
  * @summary Delete a dish
  */
-export const deleteDish = async (restaurantId: number,
-    dishId: number, options?: RequestInit): Promise<void> => {
+export const deleteDish = async (restaurantId: string,
+    dishId: string, options?: RequestInit): Promise<void> => {
 
   return customFetch<void>(getDeleteDishUrl(restaurantId,dishId),
   {
@@ -984,8 +984,8 @@ export const deleteDish = async (restaurantId: number,
 
 
 export const getDeleteDishMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: number;dishId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: number;dishId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: string;dishId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: string;dishId: string}, TContext> => {
 
 const mutationKey = ['deleteDish'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -997,7 +997,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDish>>, {restaurantId: number;dishId: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDish>>, {restaurantId: string;dishId: string}> = (props) => {
           const {restaurantId,dishId} = props ?? {};
 
           return  deleteDish(restaurantId,dishId,requestOptions)
@@ -1018,11 +1018,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete a dish
  */
 export const useDeleteDish = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: number;dishId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDish>>, TError,{restaurantId: string;dishId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteDish>>,
         TError,
-        {restaurantId: number;dishId: number},
+        {restaurantId: string;dishId: string},
         TContext
       > => {
       return useMutation(getDeleteDishMutationOptions(options));
@@ -1176,7 +1176,7 @@ export const useCreateOrder = <TError = ErrorType<ErrorResponse>,
       return useMutation(getCreateOrderMutationOptions(options));
     }
 
-export const getGetOrderUrl = (id: number,) => {
+export const getGetOrderUrl = (id: string,) => {
 
 
 
@@ -1187,7 +1187,7 @@ export const getGetOrderUrl = (id: number,) => {
 /**
  * @summary Get order details
  */
-export const getOrder = async (id: number, options?: RequestInit): Promise<Order> => {
+export const getOrder = async (id: string, options?: RequestInit): Promise<Order> => {
 
   return customFetch<Order>(getGetOrderUrl(id),
   {
@@ -1202,14 +1202,14 @@ export const getOrder = async (id: number, options?: RequestInit): Promise<Order
 
 
 
-export const getGetOrderQueryKey = (id: number,) => {
+export const getGetOrderQueryKey = (id: string,) => {
     return [
     `/api/orders/${id}`
     ] as const;
     }
 
 
-export const getGetOrderQueryOptions = <TData = Awaited<ReturnType<typeof getOrder>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetOrderQueryOptions = <TData = Awaited<ReturnType<typeof getOrder>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1236,7 +1236,7 @@ export type GetOrderQueryError = ErrorType<ErrorResponse>
  */
 
 export function useGetOrder<TData = Awaited<ReturnType<typeof getOrder>>, TError = ErrorType<ErrorResponse>>(
- id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -1253,7 +1253,7 @@ export function useGetOrder<TData = Awaited<ReturnType<typeof getOrder>>, TError
 
 
 
-export const getUpdateOrderStatusUrl = (id: number,) => {
+export const getUpdateOrderStatusUrl = (id: string,) => {
 
 
 
@@ -1264,7 +1264,7 @@ export const getUpdateOrderStatusUrl = (id: number,) => {
 /**
  * @summary Update order status (restaurant accepts/rejects/etc.)
  */
-export const updateOrderStatus = async (id: number,
+export const updateOrderStatus = async (id: string,
     orderStatusUpdate: OrderStatusUpdate, options?: RequestInit): Promise<Order> => {
 
   return customFetch<Order>(getUpdateOrderStatusUrl(id),
@@ -1281,8 +1281,8 @@ export const updateOrderStatus = async (id: number,
 
 
 export const getUpdateOrderStatusMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: number;data: BodyType<OrderStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: number;data: BodyType<OrderStatusUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: string;data: BodyType<OrderStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: string;data: BodyType<OrderStatusUpdate>}, TContext> => {
 
 const mutationKey = ['updateOrderStatus'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1294,7 +1294,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOrderStatus>>, {id: number;data: BodyType<OrderStatusUpdate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOrderStatus>>, {id: string;data: BodyType<OrderStatusUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateOrderStatus(id,data,requestOptions)
@@ -1315,11 +1315,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update order status (restaurant accepts/rejects/etc.)
  */
 export const useUpdateOrderStatus = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: number;data: BodyType<OrderStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOrderStatus>>, TError,{id: string;data: BodyType<OrderStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateOrderStatus>>,
         TError,
-        {id: number;data: BodyType<OrderStatusUpdate>},
+        {id: string;data: BodyType<OrderStatusUpdate>},
         TContext
       > => {
       return useMutation(getUpdateOrderStatusMutationOptions(options));
@@ -1621,7 +1621,7 @@ export const useAddAddress = <TError = ErrorType<unknown>,
       return useMutation(getAddAddressMutationOptions(options));
     }
 
-export const getDeleteAddressUrl = (id: number,) => {
+export const getDeleteAddressUrl = (id: string,) => {
 
 
 
@@ -1632,7 +1632,7 @@ export const getDeleteAddressUrl = (id: number,) => {
 /**
  * @summary Delete a saved address
  */
-export const deleteAddress = async (id: number, options?: RequestInit): Promise<void> => {
+export const deleteAddress = async (id: string, options?: RequestInit): Promise<void> => {
 
   return customFetch<void>(getDeleteAddressUrl(id),
   {
@@ -1647,8 +1647,8 @@ export const deleteAddress = async (id: number, options?: RequestInit): Promise<
 
 
 export const getDeleteAddressMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteAddress'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1660,7 +1660,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAddress>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAddress>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteAddress(id,requestOptions)
@@ -1681,11 +1681,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete a saved address
  */
 export const useDeleteAddress = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddress>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof deleteAddress>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
       return useMutation(getDeleteAddressMutationOptions(options));
@@ -1845,7 +1845,7 @@ export function useListAdminRestaurants<TData = Awaited<ReturnType<typeof listAd
 
 
 
-export const getSetRestaurantStatusUrl = (id: number,) => {
+export const getSetRestaurantStatusUrl = (id: string,) => {
 
 
 
@@ -1856,7 +1856,7 @@ export const getSetRestaurantStatusUrl = (id: number,) => {
 /**
  * @summary Approve or suspend a restaurant (admin only)
  */
-export const setRestaurantStatus = async (id: number,
+export const setRestaurantStatus = async (id: string,
     restaurantStatusUpdate: RestaurantStatusUpdate, options?: RequestInit): Promise<RestaurantStatusResult> => {
 
   return customFetch<RestaurantStatusResult>(getSetRestaurantStatusUrl(id),
@@ -1873,8 +1873,8 @@ export const setRestaurantStatus = async (id: number,
 
 
 export const getSetRestaurantStatusMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: number;data: BodyType<RestaurantStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: number;data: BodyType<RestaurantStatusUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: string;data: BodyType<RestaurantStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: string;data: BodyType<RestaurantStatusUpdate>}, TContext> => {
 
 const mutationKey = ['setRestaurantStatus'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1886,7 +1886,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setRestaurantStatus>>, {id: number;data: BodyType<RestaurantStatusUpdate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setRestaurantStatus>>, {id: string;data: BodyType<RestaurantStatusUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  setRestaurantStatus(id,data,requestOptions)
@@ -1907,11 +1907,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Approve or suspend a restaurant (admin only)
  */
 export const useSetRestaurantStatus = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: number;data: BodyType<RestaurantStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setRestaurantStatus>>, TError,{id: string;data: BodyType<RestaurantStatusUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof setRestaurantStatus>>,
         TError,
-        {id: number;data: BodyType<RestaurantStatusUpdate>},
+        {id: string;data: BodyType<RestaurantStatusUpdate>},
         TContext
       > => {
       return useMutation(getSetRestaurantStatusMutationOptions(options));
@@ -1994,7 +1994,7 @@ export function useListAdminUsers<TData = Awaited<ReturnType<typeof listAdminUse
 
 
 
-export const getSetUserRoleUrl = (id: number,) => {
+export const getSetUserRoleUrl = (id: string,) => {
 
 
 
@@ -2005,7 +2005,7 @@ export const getSetUserRoleUrl = (id: number,) => {
 /**
  * @summary Change a user's role (admin only)
  */
-export const setUserRole = async (id: number,
+export const setUserRole = async (id: string,
     userRoleUpdate: UserRoleUpdate, options?: RequestInit): Promise<UserRoleResult> => {
 
   return customFetch<UserRoleResult>(getSetUserRoleUrl(id),
@@ -2022,8 +2022,8 @@ export const setUserRole = async (id: number,
 
 
 export const getSetUserRoleMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: number;data: BodyType<UserRoleUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: number;data: BodyType<UserRoleUpdate>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: string;data: BodyType<UserRoleUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: string;data: BodyType<UserRoleUpdate>}, TContext> => {
 
 const mutationKey = ['setUserRole'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -2035,7 +2035,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setUserRole>>, {id: number;data: BodyType<UserRoleUpdate>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setUserRole>>, {id: string;data: BodyType<UserRoleUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  setUserRole(id,data,requestOptions)
@@ -2056,11 +2056,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Change a user's role (admin only)
  */
 export const useSetUserRole = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: number;data: BodyType<UserRoleUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setUserRole>>, TError,{id: string;data: BodyType<UserRoleUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof setUserRole>>,
         TError,
-        {id: number;data: BodyType<UserRoleUpdate>},
+        {id: string;data: BodyType<UserRoleUpdate>},
         TContext
       > => {
       return useMutation(getSetUserRoleMutationOptions(options));
@@ -2143,7 +2143,7 @@ export function useListAdminOrders<TData = Awaited<ReturnType<typeof listAdminOr
 
 
 
-export const getGetRestaurantStatsUrl = (restaurantId: number,) => {
+export const getGetRestaurantStatsUrl = (restaurantId: string,) => {
 
 
 
@@ -2154,7 +2154,7 @@ export const getGetRestaurantStatsUrl = (restaurantId: number,) => {
 /**
  * @summary Get sales stats for a restaurant
  */
-export const getRestaurantStats = async (restaurantId: number, options?: RequestInit): Promise<RestaurantStats> => {
+export const getRestaurantStats = async (restaurantId: string, options?: RequestInit): Promise<RestaurantStats> => {
 
   return customFetch<RestaurantStats>(getGetRestaurantStatsUrl(restaurantId),
   {
@@ -2169,14 +2169,14 @@ export const getRestaurantStats = async (restaurantId: number, options?: Request
 
 
 
-export const getGetRestaurantStatsQueryKey = (restaurantId: number,) => {
+export const getGetRestaurantStatsQueryKey = (restaurantId: string,) => {
     return [
     `/api/restaurants/${restaurantId}/stats`
     ] as const;
     }
 
 
-export const getGetRestaurantStatsQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurantStats>>, TError = ErrorType<unknown>>(restaurantId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetRestaurantStatsQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurantStats>>, TError = ErrorType<unknown>>(restaurantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2203,7 +2203,7 @@ export type GetRestaurantStatsQueryError = ErrorType<unknown>
  */
 
 export function useGetRestaurantStats<TData = Awaited<ReturnType<typeof getRestaurantStats>>, TError = ErrorType<unknown>>(
- restaurantId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ restaurantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
