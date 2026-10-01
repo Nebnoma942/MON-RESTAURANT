@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { usersTable, addressesTable, loyaltyHistoryTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -95,8 +95,12 @@ router.post("/users/me/addresses", requireAuth, async (req, res) => {
 // DELETE /users/me/addresses/:id
 router.delete("/users/me/addresses/:id", requireAuth, async (req, res) => {
   const id = parseInt(req.params["id"] as string ?? "0", 10);
+  if (!Number.isInteger(id) || id <= 0) {
+    res.status(400).json({ error: "Invalid address id" });
+    return;
+  }
   const deleted = await db.delete(addressesTable)
-    .where(eq(addressesTable.id, id))
+    .where(and(eq(addressesTable.id, id), eq(addressesTable.userId, req.user!.userId)))
     .returning();
   if (deleted.length === 0) {
     res.status(404).json({ error: "Address not found" });
