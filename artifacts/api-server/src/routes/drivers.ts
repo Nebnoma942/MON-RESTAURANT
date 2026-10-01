@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { driversTable, deliveryAssignmentsTable, ordersTable, restaurantsTable, usersTable, loyaltyHistoryTable } from "@workspace/db";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { driversTable, deliveryAssignmentsTable, ordersTable } from "@workspace/db";
+import { and, desc, eq } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 import { assignNearestAvailableDriver } from "../lib/dispatch";
 import { finalizeOrderDelivery } from "../lib/order-lifecycle";
