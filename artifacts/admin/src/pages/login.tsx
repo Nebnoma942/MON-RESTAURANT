@@ -76,7 +76,7 @@ export default function Login() {
             BF
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            EatBF Control Panel
+            MON RESTAURANT Control Panel
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
             Connexion réservée aux administrateurs
