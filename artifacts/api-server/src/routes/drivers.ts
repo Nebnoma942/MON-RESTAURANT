@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { driversTable, deliveryAssignmentsTable, ordersTable, restaurantsTable, usersTable } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { driversTable, deliveryAssignmentsTable, ordersTable, restaurantsTable, usersTable, loyaltyHistoryTable } from "@workspace/db";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 import { assignNearestAvailableDriver } from "../lib/dispatch";
 
@@ -135,7 +135,28 @@ router.patch("/drivers/me/deliveries/:id/status", requireAuth, requireDriver, as
   }
 
   if (status === "delivered") {
-    await db.update(ordersTable).set({ status: "delivered" }).where(eq(ordersTable.id, assignment.orderId));
+    await db.transaction(async (tx) => {
+      const [order] = await tx.select().from(ordersTable).where(eq(ordersTable.id, assignment.orderId));
+      if (order && order.status !== "delivered") {
+        await tx.update(ordersTable)
+          .set({ status: "delivered" })
+          .where(eq(ordersTable.id, assignment.orderId));
+
+        if (order.customerId && order.loyaltyPointsEarned > 0) {
+          await tx.update(usersTable)
+            .set({
+              loyaltyPoints: sql`GREATEST(0, ${usersTable.loyaltyPoints} + ${order.loyaltyPointsEarned})`,
+            })
+            .where(eq(usersTable.id, order.customerId));
+          await tx.insert(loyaltyHistoryTable).values({
+            userId: order.customerId,
+            orderId: order.id,
+            points: order.loyaltyPointsEarned,
+            description: `Points gagnés pour la commande #${order.id}`,
+          });
+        }
+      }
+    });
     await db.update(driversTable).set({ isAvailable: true }).where(eq(driversTable.id, driver.id));
   } else if (status === "cancelled") {
     // A driver cancellation does not cancel the customer's order. Put the delivery
