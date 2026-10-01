@@ -36,6 +36,10 @@ router.get("/restaurants", async (_req, res) => {
 
 // POST /restaurants — create (requires auth)
 router.post("/restaurants", requireAuth, async (req, res) => {
+  if (!["restaurant_owner", "admin"].includes(req.user!.role)) {
+    res.status(403).json({ error: "Only restaurant owners or admins can create restaurants" });
+    return;
+  }
   const { name, type, description, address, city, lat, lng, phone, email, openingHours, imageUrl } = req.body;
   if (!name || !type || !address || !city || !phone || !openingHours) {
     res.status(400).json({ error: "Missing required fields" });
@@ -64,7 +68,7 @@ router.get("/restaurants/mine", requireAuth, async (req, res) => {
 router.get("/restaurants/:id", async (req, res) => {
   const id = parseInt(req.params["id"] as string ?? "0", 10);
   const [restaurant] = await db.select().from(restaurantsTable).where(eq(restaurantsTable.id, id));
-  if (!restaurant) {
+  if (!restaurant || restaurant.status !== "approved") {
     res.status(404).json({ error: "Restaurant not found" });
     return;
   }
@@ -162,6 +166,13 @@ router.get("/restaurants/:restaurantId/dishes", async (req, res) => {
 // POST /restaurants/:restaurantId/dishes
 router.post("/restaurants/:restaurantId/dishes", requireAuth, async (req, res) => {
   const restaurantId = parseInt(req.params["restaurantId"] as string ?? "0", 10);
+  const [restaurant] = await db.select({ ownerId: restaurantsTable.ownerId })
+    .from(restaurantsTable)
+    .where(eq(restaurantsTable.id, restaurantId));
+  if (!restaurant || (restaurant.ownerId !== req.user!.userId && req.user!.role !== "admin")) {
+    res.status(403).json({ error: "Only the restaurant owner or an admin can manage this menu" });
+    return;
+  }
   const { name, description, price, category, imageUrl, available, hasPromotion, promotionPrice } = req.body;
   if (!name || price == null || !category) {
     res.status(400).json({ error: "Missing required fields" });
@@ -178,7 +189,22 @@ router.post("/restaurants/:restaurantId/dishes", requireAuth, async (req, res) =
 
 // PATCH /restaurants/:restaurantId/dishes/:dishId
 router.patch("/restaurants/:restaurantId/dishes/:dishId", requireAuth, async (req, res) => {
+  const restaurantId = parseInt(req.params["restaurantId"] as string ?? "0", 10);
   const dishId = parseInt(req.params["dishId"] as string ?? "0", 10);
+  const [restaurant] = await db.select({ ownerId: restaurantsTable.ownerId })
+    .from(restaurantsTable)
+    .where(eq(restaurantsTable.id, restaurantId));
+  if (!restaurant || (restaurant.ownerId !== req.user!.userId && req.user!.role !== "admin")) {
+    res.status(403).json({ error: "Only the restaurant owner or an admin can manage this menu" });
+    return;
+  }
+  const [existingDish] = await db.select({ id: dishesTable.id })
+    .from(dishesTable)
+    .where(and(eq(dishesTable.id, dishId), eq(dishesTable.restaurantId, restaurantId)));
+  if (!existingDish) {
+    res.status(404).json({ error: "Dish not found" });
+    return;
+  }
   const { name, description, price, category, imageUrl, available, hasPromotion, promotionPrice } = req.body;
   const [dish] = await db.update(dishesTable).set({
     ...(name && { name }),
@@ -199,8 +225,18 @@ router.patch("/restaurants/:restaurantId/dishes/:dishId", requireAuth, async (re
 
 // DELETE /restaurants/:restaurantId/dishes/:dishId
 router.delete("/restaurants/:restaurantId/dishes/:dishId", requireAuth, async (req, res) => {
+  const restaurantId = parseInt(req.params["restaurantId"] as string ?? "0", 10);
   const dishId = parseInt(req.params["dishId"] as string ?? "0", 10);
-  const deleted = await db.delete(dishesTable).where(eq(dishesTable.id, dishId)).returning();
+  const [restaurant] = await db.select({ ownerId: restaurantsTable.ownerId })
+    .from(restaurantsTable)
+    .where(eq(restaurantsTable.id, restaurantId));
+  if (!restaurant || (restaurant.ownerId !== req.user!.userId && req.user!.role !== "admin")) {
+    res.status(403).json({ error: "Only the restaurant owner or an admin can manage this menu" });
+    return;
+  }
+  const deleted = await db.delete(dishesTable)
+    .where(and(eq(dishesTable.id, dishId), eq(dishesTable.restaurantId, restaurantId)))
+    .returning();
   if (deleted.length === 0) {
     res.status(404).json({ error: "Dish not found" });
     return;
