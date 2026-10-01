@@ -34,3 +34,5 @@ jobs:
           fi
           git commit -m "chore: import V7 source into repository tree"
           git push
+
+# Trigger extraction on the next push.
