@@ -24,7 +24,7 @@ export function Sidebar() {
     <div className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col text-sidebar-foreground flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
       <div className="p-6 border-b border-sidebar-border">
         <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-primary-foreground">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
             BF
           </div>
           EatBF Admin
@@ -39,7 +39,7 @@ export function Sidebar() {
           return (
             <Link key={item.href} href={item.href}>
               <div 
-                className={`flex items-center justify-between px-3 py-2.5 rounded-md transition-colors cursor-pointer ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors cursor-pointer min-h-11 ${
                   isActive 
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -67,7 +67,7 @@ export function Sidebar() {
         </div>
         <button
           onClick={() => logout()}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-sidebar-accent/50 hover:bg-destructive hover:text-destructive-foreground transition-colors rounded-md text-sm font-medium"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-sidebar-accent/50 hover:bg-destructive hover:text-destructive-foreground transition-colors rounded-xl text-sm font-medium min-h-11"
         >
           <LogOut size={16} />
           Déconnexion
