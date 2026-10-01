@@ -301,6 +301,11 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     return;
   }
 
+  if (order.status === status) {
+    res.json({ order: formatOrder(order) });
+    return;
+  }
+
   if (req.user!.role !== "admin") {
     const [restaurant] = await db.select({ ownerId: restaurantsTable.ownerId }).from(restaurantsTable).where(eq(restaurantsTable.id, order.restaurantId));
     if (req.user!.role !== "restaurant_owner" || !restaurant || restaurant.ownerId !== req.user!.userId) {
