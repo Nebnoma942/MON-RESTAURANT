@@ -65,7 +65,7 @@ export default function RegisterScreen() {
         <View style={styles.titleSection}>
           <Text style={[styles.title, { color: colors.foreground, fontFamily: "Inter_700Bold" }]}>Créer un compte</Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
-            Rejoignez EatBF et profitez de repas livrés chez vous
+            Rejoignez MON RESTAURANT et profitez de repas livrés chez vous
           </Text>
         </View>
 
