@@ -158,7 +158,7 @@ export default function RestaurantScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const restaurantId = parseInt(id ?? "0", 10);
+  const restaurantId = id ?? "";
   const cart = useCart();
 
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
