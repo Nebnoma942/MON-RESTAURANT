@@ -25,7 +25,7 @@ interface CartContextValue extends CartState {
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
-const CART_KEY = "eatbf_cart";
+const CART_KEY = "mon_restaurant_cart";
 
 function computeTotal(items: CartItem[]) {
   return items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
