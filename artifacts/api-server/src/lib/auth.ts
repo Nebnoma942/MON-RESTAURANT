@@ -3,6 +3,11 @@ import type { Request, Response, NextFunction } from "express";
 
 const SECRET = process.env["SESSION_SECRET"];
 
+function getSecret(): string {
+  if (!SECRET || SECRET.length < 32) throw new Error("SESSION_SECRET must be set and contain at least 32 characters.");
+  return SECRET;
+}
+
 if (!SECRET || SECRET.length < 32) {
   throw new Error("SESSION_SECRET must be set and contain at least 32 characters.");
 }
@@ -13,11 +18,15 @@ export interface JwtPayload {
 }
 
 export function signToken(payload: JwtPayload): string {
-  return jwt.sign(payload, SECRET, { expiresIn: "30d" });
+  return jwt.sign(payload, getSecret(), { expiresIn: "30d" });
 }
 
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, SECRET) as JwtPayload;
+  const decoded = jwt.verify(token, getSecret());
+  if (typeof decoded !== "object" || decoded === null || typeof decoded.userId !== "number" || typeof decoded.role !== "string") {
+    throw new Error("Invalid token payload");
+  }
+  return decoded as unknown as JwtPayload;
 }
 
 declare global {
