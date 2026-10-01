@@ -8,10 +8,6 @@ function getSecret(): string {
   return SECRET;
 }
 
-if (!SECRET || SECRET.length < 32) {
-  throw new Error("SESSION_SECRET must be set and contain at least 32 characters.");
-}
-
 export interface JwtPayload {
   userId: number;
   role: string;
