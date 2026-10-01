@@ -333,18 +333,24 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     return;
   }
 
-  const [updated] = await db.update(ordersTable).set({ status: status as OrderStatus }).where(eq(ordersTable.id, id)).returning();
-  if (!updated) {
-    res.status(500).json({ error: "Failed to update order" });
+  if (status === "delivered") {
+    const finalized = await finalizeOrderDelivery(id);
+    if (!finalized) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+    res.json({ order: formatOrder(finalized) });
     return;
   }
 
-  if (status === "delivered") {
-    const finalized = await finalizeOrderDelivery(id);
-    if (finalized) {
-      res.json({ order: formatOrder(finalized), dispatch });
-      return;
-    }
+  const [updated] = await db.update(ordersTable)
+    .set({ status: status as OrderStatus })
+    .where(eq(ordersTable.id, id))
+    .returning();
+
+  if (!updated) {
+    res.status(500).json({ error: "Failed to update order" });
+    return;
   }
 
   if (status === "cancelled" && order.status !== "cancelled") {
