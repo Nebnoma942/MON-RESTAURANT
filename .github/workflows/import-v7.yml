@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ZIP="Restaurant-Burkina-Faso-source-v7-1.zip"
+          ZIP="Restaurant-Burkina-Faso-source-v7.zip"
           test -f "$ZIP"
           rm -rf /tmp/v7-import
           mkdir -p /tmp/v7-import
@@ -31,7 +31,8 @@ jobs:
             ROOT="$ROOT/Restaurant-Burkina-Faso-source-v7"
           fi
 
-          find "$ROOT" -type f -print | wc -l
+          echo "Files to import:"
+          find "$ROOT" -type f | sort
           cp -a "$ROOT"/. .
 
       - name: Commit extracted V7 tree
