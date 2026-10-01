@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,9 +41,13 @@ export default function Login() {
     },
   });
 
-  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, setLocation]);
+
   if (isAuthenticated) {
-    setLocation("/dashboard");
     return null;
   }
 
