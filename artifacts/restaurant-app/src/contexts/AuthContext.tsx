@@ -26,8 +26,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("eatbf_token");
-    const storedUser = localStorage.getItem("eatbf_user");
+    const stored = localStorage.getItem("mon_restaurant_token");
+    const storedUser = localStorage.getItem("mon_restaurant_user");
     if (!stored || !storedUser) return;
 
     try {
@@ -39,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(parsed);
       setAuthTokenGetter(() => stored);
     } catch {
-      localStorage.removeItem("eatbf_token");
-      localStorage.removeItem("eatbf_user");
+      localStorage.removeItem("mon_restaurant_token");
+      localStorage.removeItem("mon_restaurant_user");
       setAuthTokenGetter(null);
     }
   }, []);
@@ -49,16 +49,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTokenState(newToken);
     setUser(newUser);
     setAuthTokenGetter(() => newToken);
-    localStorage.setItem("eatbf_token", newToken);
-    localStorage.setItem("eatbf_user", JSON.stringify(newUser));
+    localStorage.setItem("mon_restaurant_token", newToken);
+    localStorage.setItem("mon_restaurant_user", JSON.stringify(newUser));
   };
 
   const logout = () => {
     setTokenState(null);
     setUser(null);
     setAuthTokenGetter(null);
-    localStorage.removeItem("eatbf_token");
-    localStorage.removeItem("eatbf_user");
+    localStorage.removeItem("mon_restaurant_token");
+    localStorage.removeItem("mon_restaurant_user");
   };
 
   return (
