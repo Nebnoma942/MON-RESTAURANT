@@ -112,9 +112,9 @@ export default function OrderDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const orderId = parseInt(id ?? "0", 10);
+  const orderId = id ?? "";
 
-  const { data: order, isLoading, refetch } = useGetOrder(orderId, {
+  const { data: order, isLoading, refetch } = useGetOrder(orderId as any, {
     query: {
       queryKey: ["order", orderId],
       refetchInterval: 30000, // Poll every 30s
