@@ -91,6 +91,10 @@ router.post("/orders", optionalAuth, async (req, res) => {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
+  if (!["orange_money", "moov_money", "cash"].includes(paymentMethod)) {
+    res.status(400).json({ error: "Invalid payment method" });
+    return;
+  }
   if (items.some((item) => !Number.isInteger(item.dishId) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 50)) {
     res.status(400).json({ error: "Each item must have a valid quantity between 1 and 50" });
     return;
