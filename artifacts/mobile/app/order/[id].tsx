@@ -116,6 +116,7 @@ export default function OrderDetailScreen() {
 
   const { data: order, isLoading, refetch } = useGetOrder(orderId, {
     query: {
+      queryKey: ["order", orderId],
       refetchInterval: 30000, // Poll every 30s
     },
   });
