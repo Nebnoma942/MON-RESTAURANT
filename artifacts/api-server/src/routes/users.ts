@@ -76,13 +76,21 @@ router.post("/users/me/addresses", requireAuth, async (req, res) => {
     res.status(400).json({ error: "Missing required fields" });
     return;
   }
-  const [addr] = await db.insert(addressesTable).values({
-    userId: req.user!.userId,
-    label,
-    address,
-    city,
-    isDefault: isDefault ?? false,
-  }).returning();
+  const addr = await db.transaction(async (tx) => {
+    if (isDefault === true) {
+      await tx.update(addressesTable)
+        .set({ isDefault: false })
+        .where(eq(addressesTable.userId, req.user!.userId));
+    }
+    const [created] = await tx.insert(addressesTable).values({
+      userId: req.user!.userId,
+      label,
+      address,
+      city,
+      isDefault: isDefault ?? false,
+    }).returning();
+    return created;
+  });
   res.status(201).json({
     id: addr!.id,
     label: addr!.label,
