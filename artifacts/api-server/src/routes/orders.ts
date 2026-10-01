@@ -238,8 +238,8 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
       res.status(403).json({ error: "Only the restaurant or an admin can change this order status" });
       return;
     }
-    const restaurantAllowed = ["confirmed", "preparing", "ready", "cancelled"];
-    if (!restaurantAllowed.includes(status)) {
+    const restaurantAllowed: string[] = ["confirmed", "preparing", "ready", "cancelled"];
+    if (!restaurantAllowed.includes(status ?? "")) {
       res.status(403).json({ error: "The restaurant cannot set delivery-side statuses" });
       return;
     }
@@ -254,7 +254,7 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     delivered: [],
     cancelled: [],
   };
-  if (!allowedTransitions[order.status]?.includes(status) && order.status !== status) {
+  if (!allowedTransitions[order.status]?.includes(status ?? "") && order.status !== status) {
     res.status(409).json({ error: `Invalid transition from ${order.status} to ${status}` });
     return;
   }
