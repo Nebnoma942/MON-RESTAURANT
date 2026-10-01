@@ -1,0 +1,2 @@
+const API=(process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api").replace(/\/$/,"");
+export async function api<T>(path:string,token:string,init:RequestInit={}):Promise<T>{const r=await fetch(`${API}${path}`,{...init,headers:{"Content-Type":"application/json",...(init.headers||{}),Authorization:`Bearer ${token}`}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Erreur API");return d as T;}

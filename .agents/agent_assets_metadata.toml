@@ -1,0 +1,47 @@
+uploads = []
+
+[[generated]]
+id = "AxNYPr1fDNysGHG--K2eR"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "S7AXOlwUOjuKU8r7A6NDP"
+uri = "file://artifacts/mobile/assets/images/hero-food.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "QnzOqCG_WAqCW5tzOOkor"
+uri = "file://artifacts/mobile/assets/images/restaurant-icon.png"
+type = "image"
+title = "generated_image"
+
+[[outputs]]
+id = "gLuY-u6eYRwRqzTXxI3en"
+uri = "file://attached_assets/Cahier_des_charges_site_restaurants_Burkina-1_1781697165571.docx"
+type = "word_document"
+title = "Cahier des charges — Plateforme EatBF"
+description = "Version originale du cahier des charges de la plateforme de restaurants en ligne au Burkina Faso."
+logical_id = "1e1445da-2d1c-4992-b171-fd2d6f4ce714"
+content_hash = "sha256:d7e4902aab122d7f84b65b1f944bf97e96b0274d20934ba66e812542ba78bdbe"
+size = 37770
+mtime_ms = 1781697210348
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:7452c817-b628-44fe-aa91-e53fcd12d3f6/1e1445da-2d1c-4992-b171-fd2d6f4ce714/8802305b-0761-4a57-ac3b-48924b5fe475"
+storage_version_token = "1789736319340027"
+content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+[[outputs]]
+id = "3e8LGqak_KaTzCUdFJnqA"
+uri = "file://docs/Cahier_des_charges_EatBF_version_2.docx"
+type = "word_document"
+title = "Cahier des charges EatBF — Version 2"
+description = "Version actualisée du cahier des charges, alignée sur le MVP actuel et séparant les fonctions implémentées, partielles et à intégrer."
+logical_id = "396651e3-e03c-412f-882f-590602026af4"
+content_hash = "sha256:2b1bb3e44ecfcacba4a4c4932c07e862884865aacba3b32b20272750c1401000"
+size = 45863
+mtime_ms = 1789736580278
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:7452c817-b628-44fe-aa91-e53fcd12d3f6/396651e3-e03c-412f-882f-590602026af4/30a669fa-eccc-4e0e-a0be-62d4cae86157"
+storage_version_token = "1789736593185511"
+content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

@@ -1,0 +1,1436 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Plateforme de restaurants en ligne - Burkina Faso
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: restaurants
+    description: Restaurant management
+  - name: menus
+    description: Menu & dish management
+  - name: orders
+    description: Order management
+  - name: users
+    description: User profiles & loyalty
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # Auth
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [auth]
+      summary: Register a new user (client or restaurant owner)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegisterInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [auth]
+      summary: Login with phone/email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Restaurants
+  /restaurants:
+    get:
+      operationId: listRestaurants
+      tags: [restaurants]
+      summary: List restaurants
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
+    post:
+      operationId: createRestaurant
+      tags: [restaurants]
+      summary: Register a new restaurant (pending validation)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /restaurants/{id}:
+    get:
+      operationId: getRestaurant
+      tags: [restaurants]
+      summary: Get restaurant details with menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateRestaurant
+      tags: [restaurants]
+      summary: Update restaurant info
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /restaurants/mine:
+    get:
+      operationId: getMyRestaurant
+      tags: [restaurants]
+      summary: Get the restaurant owned by the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Menu / Dishes
+  /restaurants/{restaurantId}/dishes:
+    get:
+      operationId: getRestaurantDishes
+      tags: [menus]
+      summary: List dishes for a restaurant
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dish"
+    post:
+      operationId: createDish
+      tags: [menus]
+      summary: Add a dish to the menu
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DishInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dish"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /restaurants/{restaurantId}/dishes/{dishId}:
+    patch:
+      operationId: updateDish
+      tags: [menus]
+      summary: Update a dish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DishUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dish"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteDish
+      tags: [menus]
+      summary: Delete a dish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Orders
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List orders for the current user (client or restaurant)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Place a new order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /orders/{id}/status:
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status (restaurant accepts/rejects/etc.)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Users
+  /users/me:
+    patch:
+      operationId: updateProfile
+      tags: [users]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me/loyalty:
+    get:
+      operationId: getLoyalty
+      tags: [users]
+      summary: Get current user loyalty points
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoyaltyInfo"
+
+  /users/me/addresses:
+    get:
+      operationId: listAddresses
+      tags: [users]
+      summary: List saved delivery addresses
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Address"
+    post:
+      operationId: addAddress
+      tags: [users]
+      summary: Save a delivery address
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+
+  /users/me/addresses/{id}:
+    delete:
+      operationId: deleteAddress
+      tags: [users]
+      summary: Delete a saved address
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Admin
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Platform-wide stats (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        "403":
+          description: Forbidden
+
+  /admin/restaurants:
+    get:
+      operationId: listAdminRestaurants
+      tags: [admin]
+      summary: List all restaurants with owner info (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminRestaurant"
+        "403":
+          description: Forbidden
+
+  /admin/restaurants/{id}/status:
+    patch:
+      operationId: setRestaurantStatus
+      tags: [admin]
+      summary: Approve or suspend a restaurant (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantStatusUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantStatusResult"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: List all users (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+        "403":
+          description: Forbidden
+
+  /admin/users/{id}/role:
+    patch:
+      operationId: setUserRole
+      tags: [admin]
+      summary: Change a user's role (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRoleUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRoleResult"
+        "403":
+          description: Forbidden
+
+  /admin/orders:
+    get:
+      operationId: listAdminOrders
+      tags: [admin]
+      summary: List all platform orders (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminOrder"
+        "403":
+          description: Forbidden
+
+  # Stats (restaurant dashboard)
+  /restaurants/{restaurantId}/stats:
+    get:
+      operationId: getRestaurantStats
+      tags: [restaurants]
+      summary: Get sales stats for a restaurant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantStats"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [client, restaurant_owner, admin]
+        loyaltyPoints:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - phone
+        - role
+        - loyaltyPoints
+        - createdAt
+
+    UserRegisterInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+          minLength: 8
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+          enum: [client, restaurant_owner]
+      required:
+        - name
+        - phone
+        - password
+        - role
+
+    UserLoginInput:
+      type: object
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+      required:
+        - phone
+        - password
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: ["string", "null"]
+        address:
+          type: string
+        city:
+          type: string
+        lat:
+          type: ["number", "null"]
+        lng:
+          type: ["number", "null"]
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        openingHours:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, suspended]
+        rating:
+          type: ["number", "null"]
+        reviewCount:
+          type: integer
+        ownerId:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - address
+        - city
+        - phone
+        - openingHours
+        - status
+        - reviewCount
+        - ownerId
+        - createdAt
+
+    RestaurantDetail:
+      allOf:
+        - $ref: "#/components/schemas/Restaurant"
+        - type: object
+          properties:
+            dishes:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dish"
+          required:
+            - dishes
+
+    RestaurantInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        type:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        phone:
+          type: string
+        email:
+          type: string
+        openingHours:
+          type: string
+        imageUrl:
+          type: string
+      required:
+        - name
+        - type
+        - address
+        - city
+        - phone
+        - openingHours
+
+    RestaurantUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        phone:
+          type: string
+        email:
+          type: string
+        openingHours:
+          type: string
+        imageUrl:
+          type: string
+
+    RestaurantStats:
+      type: object
+      properties:
+        totalOrders:
+          type: integer
+        completedOrders:
+          type: integer
+        totalRevenue:
+          type: number
+        commissionOwed:
+          type: number
+        averageRating:
+          type: ["number", "null"]
+        todayOrders:
+          type: integer
+        todayRevenue:
+          type: number
+      required:
+        - totalOrders
+        - completedOrders
+        - totalRevenue
+        - commissionOwed
+        - todayOrders
+        - todayRevenue
+
+    Dish:
+      type: object
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        price:
+          type: number
+        category:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        available:
+          type: boolean
+        hasPromotion:
+          type: boolean
+        promotionPrice:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - restaurantId
+        - name
+        - price
+        - category
+        - available
+        - hasPromotion
+        - createdAt
+
+    DishInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+        category:
+          type: string
+        imageUrl:
+          type: string
+        available:
+          type: boolean
+        hasPromotion:
+          type: boolean
+        promotionPrice:
+          type: number
+      required:
+        - name
+        - price
+        - category
+
+    DishUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+        imageUrl:
+          type: string
+        available:
+          type: boolean
+        hasPromotion:
+          type: boolean
+        promotionPrice:
+          type: number
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        restaurantId:
+          type: integer
+        restaurantName:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivering, delivered, cancelled]
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        deliveryAddress:
+          type: string
+        deliveryCity:
+          type: string
+        deliveryLat:
+          type: ["number", "null"]
+        deliveryLng:
+          type: ["number", "null"]
+        scheduledAt:
+          type: ["string", "null"]
+        subtotal:
+          type: number
+        deliveryFee:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        paymentMethod:
+          type: string
+          enum: [orange_money, moov_money, cash]
+        paymentStatus:
+          type: string
+          enum: [pending, paid, failed, refunded]
+        loyaltyPointsUsed:
+          type: integer
+        loyaltyPointsEarned:
+          type: integer
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - clientId
+        - restaurantId
+        - restaurantName
+        - status
+        - items
+        - deliveryAddress
+        - deliveryCity
+        - subtotal
+        - deliveryFee
+        - discount
+        - total
+        - paymentMethod
+        - paymentStatus
+        - loyaltyPointsUsed
+        - loyaltyPointsEarned
+        - createdAt
+
+    OrderItem:
+      type: object
+      properties:
+        dishId:
+          type: integer
+        dishName:
+          type: string
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+        totalPrice:
+          type: number
+      required:
+        - dishId
+        - dishName
+        - quantity
+        - unitPrice
+        - totalPrice
+
+    OrderInput:
+      type: object
+      properties:
+        restaurantId:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemInput"
+          minItems: 1
+        deliveryAddress:
+          type: string
+        deliveryCity:
+          type: string
+        deliveryLat:
+          type: number
+        deliveryLng:
+          type: number
+        guestName:
+          type: string
+        guestPhone:
+          type: string
+        scheduledAt:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [orange_money, moov_money, cash]
+        loyaltyPointsUsed:
+          type: integer
+        notes:
+          type: string
+      required:
+        - restaurantId
+        - items
+        - deliveryAddress
+        - deliveryCity
+        - paymentMethod
+
+    OrderItemInput:
+      type: object
+      properties:
+        dishId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+        - dishId
+        - quantity
+
+    OrderStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [confirmed, preparing, ready, delivering, delivered, cancelled]
+      required:
+        - status
+
+    LoyaltyInfo:
+      type: object
+      properties:
+        points:
+          type: integer
+        pointsValue:
+          type: number
+        nextRewardAt:
+          type: integer
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/LoyaltyEntry"
+      required:
+        - points
+        - pointsValue
+        - nextRewardAt
+        - history
+
+    LoyaltyEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        points:
+          type: integer
+        description:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - points
+        - description
+        - createdAt
+
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        lat:
+          type: ["number", "null"]
+        lng:
+          type: ["number", "null"]
+        isDefault:
+          type: boolean
+      required:
+        - id
+        - label
+        - address
+        - city
+        - isDefault
+
+    AddressInput:
+      type: object
+      properties:
+        label:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        isDefault:
+          type: boolean
+      required:
+        - label
+        - address
+        - city
+
+    AdminStats:
+      type: object
+      properties:
+        users:
+          type: object
+          properties:
+            total:
+              type: integer
+            clients:
+              type: integer
+            restaurantOwners:
+              type: integer
+            admins:
+              type: integer
+          required: [total, clients, restaurantOwners, admins]
+        restaurants:
+          type: object
+          properties:
+            total:
+              type: integer
+            pending:
+              type: integer
+            approved:
+              type: integer
+            suspended:
+              type: integer
+          required: [total, pending, approved, suspended]
+        orders:
+          type: object
+          properties:
+            total:
+              type: integer
+            today:
+              type: integer
+            byStatus:
+              type: object
+              additionalProperties:
+                type: integer
+          required: [total, today, byStatus]
+        revenue:
+          type: object
+          properties:
+            total:
+              type: number
+            today:
+              type: number
+            commission:
+              type: number
+          required: [total, today, commission]
+      required: [users, restaurants, orders, revenue]
+
+    AdminRestaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        city:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, suspended]
+        rating:
+          type: ["number", "null"]
+        reviewCount:
+          type: integer
+        ownerId:
+          type: integer
+        ownerName:
+          type: ["string", "null"]
+        ownerPhone:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, name, type, city, phone, status, reviewCount, ownerId, createdAt]
+
+    RestaurantStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, approved, suspended]
+      required: [status]
+
+    RestaurantStatusResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum: [pending, approved, suspended]
+      required: [id, status]
+
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [client, restaurant_owner, admin]
+        loyaltyPoints:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, name, phone, role, loyaltyPoints, createdAt]
+
+    UserRoleUpdate:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [client, restaurant_owner, admin]
+      required: [role]
+
+    UserRoleResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          type: string
+          enum: [client, restaurant_owner, admin]
+      required: [id, role]
+
+    AdminOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        restaurantId:
+          type: integer
+        restaurantName:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivering, delivered, cancelled]
+        subtotal:
+          type: number
+        deliveryFee:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        deliveryCity:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [orange_money, moov_money, cash]
+        itemCount:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, customerId, restaurantId, restaurantName, status, subtotal, deliveryFee, discount, total, deliveryCity, paymentMethod, itemCount, createdAt]
