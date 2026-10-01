@@ -121,7 +121,7 @@ function PaymentInstructionModal({ orderId, amount, method, onClose }: PaymentIn
               onPress={onClose}
             >
               <Feather name="check-circle" size={18} color="#fff" />
-              <Text style={[styles.confirmBtnText, { fontFamily: "Inter_700Bold" }]}>J'ai effectué le paiement</Text>
+              <Text style={[styles.confirmBtnText, { fontFamily: "Inter_700Bold" }]}>Fermer et attendre la confirmation</Text>
             </Pressable>
           </View>
         </View>
