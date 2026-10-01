@@ -53,7 +53,7 @@ export default function OrdersPage() {
 
   const { data: restaurant } = useGetMyRestaurant();
   const { data: orders, isLoading } = useListOrders({
-    query: { refetchInterval: 10000 },
+    query: { queryKey: ["orders"], refetchInterval: 10000 },
   });
 
   const updateStatus = useUpdateOrderStatus({
