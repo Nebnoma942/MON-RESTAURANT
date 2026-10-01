@@ -4,6 +4,7 @@ import { driversTable, deliveryAssignmentsTable, ordersTable, restaurantsTable, 
 import { and, desc, eq, sql } from "drizzle-orm";
 import { requireAuth } from "../lib/auth";
 import { assignNearestAvailableDriver } from "../lib/dispatch";
+import { finalizeOrderDelivery } from "../lib/order-lifecycle";
 
 const router: IRouter = Router();
 
@@ -112,8 +113,8 @@ router.patch("/drivers/me/deliveries/:id/status", requireAuth, requireDriver, as
   const assignmentTransitions: Record<string, string[]> = {
     assigned: ["accepted", "cancelled"],
     accepted: ["picked_up", "cancelled"],
-    picked_up: ["delivering", "cancelled"],
-    delivering: ["delivered", "cancelled"],
+    picked_up: ["delivering"],
+    delivering: ["delivered"],
     delivered: [],
     cancelled: [],
   };
@@ -135,28 +136,11 @@ router.patch("/drivers/me/deliveries/:id/status", requireAuth, requireDriver, as
   }
 
   if (status === "delivered") {
-    await db.transaction(async (tx) => {
-      const [order] = await tx.select().from(ordersTable).where(eq(ordersTable.id, assignment.orderId));
-      if (order && order.status !== "delivered") {
-        await tx.update(ordersTable)
-          .set({ status: "delivered" })
-          .where(eq(ordersTable.id, assignment.orderId));
-
-        if (order.customerId && order.loyaltyPointsEarned > 0) {
-          await tx.update(usersTable)
-            .set({
-              loyaltyPoints: sql`GREATEST(0, ${usersTable.loyaltyPoints} + ${order.loyaltyPointsEarned})`,
-            })
-            .where(eq(usersTable.id, order.customerId));
-          await tx.insert(loyaltyHistoryTable).values({
-            userId: order.customerId,
-            orderId: order.id,
-            points: order.loyaltyPointsEarned,
-            description: `Points gagnés pour la commande #${order.id}`,
-          });
-        }
-      }
-    });
+    const finalized = await finalizeOrderDelivery(assignment.orderId);
+    if (!finalized) {
+      res.status(409).json({ error: "Order could not be finalized" });
+      return;
+    }
     await db.update(driversTable).set({ isAvailable: true }).where(eq(driversTable.id, driver.id));
   } else if (status === "cancelled") {
     // A driver cancellation does not cancel the customer's order. Put the delivery
