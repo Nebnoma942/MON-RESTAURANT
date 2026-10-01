@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { customFetch, useCreateOrder } from "@workspace/api-client-react";
+import { useCreateOrder } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
