@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
+    setBaseUrl(process.env.EXPO_PUBLIC_DOMAIN ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` : "https://mon-restaurant-api-prod.onrender.com");
 
     let currentToken: string | null = null;
     setAuthTokenGetter(() => currentToken);
