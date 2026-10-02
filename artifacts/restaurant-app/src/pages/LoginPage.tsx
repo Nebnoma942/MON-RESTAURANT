@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { useLoginUser, useRegisterUser } from "@workspace/api-client-react";
+import { useLoginUser } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
 
 export default function LoginPage() {
-  const [tab, setTab] = useState<"login" | "register">("login");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [error, setError] = useState("");
 
   const { login } = useAuth();
@@ -24,15 +22,6 @@ export default function LoginPage() {
     },
   });
 
-  const registerMutation = useRegisterUser({
-    mutation: {
-      onSuccess: (data) => {
-        login(data.token, data.user);
-        navigate("/");
-      },
-      onError: () => setError("Erreur lors de l'inscription"),
-    },
-  });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +29,6 @@ export default function LoginPage() {
     loginMutation.mutate({ data: { phone, password } });
   };
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    registerMutation.mutate({
-      data: { name, phone, password, role: "restaurant_owner" },
-    });
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -57,31 +39,7 @@ export default function LoginPage() {
             <span className="text-3xl">🍽️</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">MON RESTAURANT</h1>
-          <p className="text-muted-foreground text-sm mt-1">Espace Restaurateur</p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex bg-muted rounded-xl p-1 mb-6">
-          <button
-            onClick={() => setTab("login")}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              tab === "login"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
-            }`}
-          >
-            Connexion
-          </button>
-          <button
-            onClick={() => setTab("register")}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              tab === "register"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
-            }`}
-          >
-            Inscription
-          </button>
+          <p className="text-muted-foreground text-sm mt-1">Espace Restaurateur — accès fourni par MON RESTAURANT</p>
         </div>
 
         {/* Form */}
@@ -91,9 +49,7 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-
-          {tab === "login" ? (
-            <form onSubmit={handleLogin} className="space-y-4">
+<form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">
                   Téléphone
