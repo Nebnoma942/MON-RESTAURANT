@@ -21,6 +21,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useColors } from "@/hooks/useColors";
 
+const CLIENT_API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL || "https://mon-restaurant-api-prod.onrender.com").replace(/\/$/, "");
+
 const PAYMENT_METHODS = [
   { id: "orange_money" as const, label: "Orange Money", icon: "smartphone", color: "#FF6600" },
   { id: "moov_money" as const, label: "Moov Money", icon: "smartphone", color: "#0066CC" },
@@ -199,7 +201,7 @@ export default function CartScreen() {
           params.set("lng", String(coords.lng));
         }
 
-        const response = await fetch(`/api/delivery/quote?${params.toString()}`);
+        const response = await fetch(`${CLIENT_API_BASE_URL}/api/delivery/quote?${params.toString()}`);
         if (!response.ok) throw new Error("Unable to calculate delivery fee");
         const quote = await response.json() as {
           fee: number;
