@@ -28,48 +28,6 @@ function mapOrder(o){return{id:o.id,clientId:o.customer_id,restaurantId:o.restau
 async function me(req){const t=tok(req);if(!t)return null;const u=await sb("/auth/v1/user",{},t);const p=await sb("/rest/v1/profiles?id=eq."+enc(u.id)+"&select=*&limit=1",{},t);return p?.[0]?{id:u.id,role:p[0].role,profile:p[0],token:t}:null}
 const synthetic=p=>p.replace(/[^0-9+]/g,"")+"@auth.mon-restaurant.local";
 
-async function signInOrCreateAccount({email,phone,password,name,role}){
-  try{
-    const a=await sb("/auth/v1/token?grant_type=password",{method:"POST",body:JSON.stringify({email,password})});
-    return a;
-  }catch{
-    const a=await sb("/auth/v1/signup",{method:"POST",body:JSON.stringify({email,password,data:{full_name:name,phone,role}})});
-    if(!a?.access_token) throw new Error("Bootstrap account requires email confirmation: "+email);
-    await sb("/rest/v1/profiles",{method:"POST",headers:{Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:a.user.id,full_name:name,phone,role,status:"active"})},a.access_token);
-    return a;
-  }
-}
-
-async function bootstrapAccounts(){
-  const adminEmail=process.env.BOOTSTRAP_ADMIN_EMAIL, adminPhone=process.env.BOOTSTRAP_ADMIN_PHONE, adminPassword=process.env.BOOTSTRAP_ADMIN_PASSWORD;
-  const restoEmail=process.env.BOOTSTRAP_RESTAURANT_EMAIL, restoPhone=process.env.BOOTSTRAP_RESTAURANT_PHONE, restoPassword=process.env.BOOTSTRAP_RESTAURANT_PASSWORD;
-  if(!adminEmail||!adminPhone||!adminPassword||!restoEmail||!restoPhone||!restoPassword) return;
-  try{
-    const admin=await signInOrCreateAccount({email:adminEmail,phone:adminPhone,password:adminPassword,name:"MON RESTAURANT Administrateur",role:"restaurant_owner"});
-    await sb("/rest/v1/profiles?id=eq."+enc(admin.user.id),{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({full_name:"MON RESTAURANT Administrateur",phone:adminPhone,role:"admin",status:"active"})},admin.access_token);
-
-    const resto=await signInOrCreateAccount({email:restoEmail,phone:restoPhone,password:restoPassword,name:"MON RESTAURANT Restaurateur",role:"restaurant_owner"});
-    const members=await sb("/rest/v1/restaurant_members?user_id=eq."+enc(resto.user.id)+"&status=eq.active&select=restaurant_id&limit=1",{},resto.access_token);
-    let restaurantId=members?.[0]?.restaurant_id||null;
-    if(!restaurantId){
-      restaurantId=await sb("/rest/v1/rpc/create_restaurant",{method:"POST",body:JSON.stringify({
-        p_name:"MON RESTAURANT — Démo",
-        p_city:"Ouagadougou",
-        p_description:"Restaurant de démonstration MON RESTAURANT",
-        p_phone:restoPhone,
-        p_email:restoEmail,
-        p_address_text:"Ouagadougou",
-        p_neighborhood:null,
-        p_location:null,
-        p_location_accuracy_m:null
-      })},resto.access_token);
-    }
-    try{
-      await sb("/rest/v1/rpc/change_restaurant_status",{method:"POST",body:JSON.stringify({p_restaurant_id:restaurantId,p_new_status:"approved",p_reason:"Compte de démonstration MON RESTAURANT"})},admin.access_token);
-    }catch{}
-    console.log("Bootstrap accounts ready:",adminEmail,restoEmail);
-  }catch(e){ console.error("Bootstrap accounts skipped:",e?.message||e); }
-}
 
 async function route(req,res){
   if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":ORIGINS[0]||"*","access-control-allow-headers":"authorization,content-type","access-control-allow-methods":"GET,POST,PATCH,OPTIONS"});return res.end();}
@@ -98,4 +56,4 @@ async function route(req,res){
     return send(res,404,{error:"Route not found"});
   }catch(e){return send(res,400,{error:e?.message||String(e)});}
 }
-http.createServer(route).listen(PORT,"0.0.0.0",()=>{console.log("MON-RESTAURANT API listening on "+PORT);bootstrapAccounts();});
+http.createServer(route).listen(PORT,"0.0.0.0",()=>console.log("MON-RESTAURANT API listening on "+PORT));
