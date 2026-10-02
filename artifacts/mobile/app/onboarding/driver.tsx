@@ -56,7 +56,7 @@ export default function DriverOnboardingScreen() {
         <View style={[styles.multiNote, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Feather name="info" size={18} color={colors.primary} />
           <Text style={[styles.multiNoteText, { color: colors.foreground, fontFamily: "Inter_400Regular" }]}>
-            Notre application livreur est une plateforme multi-entreprises. En tant que livreur, vous pouvez accepter des livraisons de plusieurs entreprises partenaires, pas seulement EatBF.
+            Notre application livreur est une plateforme multi-entreprises. En tant que livreur, vous pouvez accepter des livraisons de plusieurs entreprises partenaires, pas seulement MON RESTAURANT.
           </Text>
         </View>
 
@@ -66,7 +66,7 @@ export default function DriverOnboardingScreen() {
 
         <Pressable
           style={[styles.ctaBtn, { backgroundColor: "#D97706" }]}
-          onPress={() => Linking.openURL("https://play.google.com/store/apps/details?id=com.eatbf.driver")}
+          onPress={() => Linking.openURL("https://play.google.com/store/apps/details?id=com.monrestaurant.driver")}
         >
           <View style={styles.btnInner}>
             <Feather name="download" size={18} color="#fff" />
@@ -76,7 +76,7 @@ export default function DriverOnboardingScreen() {
 
         <Pressable
           style={[styles.secondaryBtn, { borderColor: "#D97706" }]}
-          onPress={() => Linking.openURL("https://apps.apple.com/app/eatbf-driver/id0000000000")}
+          onPress={() => Linking.openURL("https://apps.apple.com/app/monrestaurant-driver/id0000000000")}
         >
           <View style={styles.btnInner}>
             <Feather name="download" size={18} color="#D97706" />
