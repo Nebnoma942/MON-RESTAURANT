@@ -35,7 +35,7 @@ export default function RestaurantOnboardingScreen() {
             Devenez partenaire restaurateur
           </Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground, fontFamily: "Inter_400Regular" }]}>
-            Inscrivez votre restaurant sur EatBF et touchez des milliers de clients à Ouagadougou et dans les grandes villes du Burkina Faso.
+            Inscrivez votre restaurant sur MON RESTAURANT et touchez des milliers de clients à Ouagadougou et dans les grandes villes du Burkina Faso.
           </Text>
         </View>
 
@@ -66,7 +66,7 @@ export default function RestaurantOnboardingScreen() {
 
         <Pressable
           style={[styles.ctaBtn, { backgroundColor: colors.primary }]}
-          onPress={() => Linking.openURL("https://play.google.com/store/apps/details?id=com.eatbf.restaurant")}
+          onPress={() => Linking.openURL("https://mon-restaurant-web.onrender.com")}
         >
           <View style={styles.btnInner}>
             <Feather name="download" size={18} color="#fff" />
@@ -76,7 +76,7 @@ export default function RestaurantOnboardingScreen() {
 
         <Pressable
           style={[styles.secondaryBtn, { borderColor: colors.primary }]}
-          onPress={() => Linking.openURL("https://apps.apple.com/app/eatbf-restaurant/id0000000000")}
+          onPress={() => Linking.openURL("https://apps.apple.com/app/monrestaurant-restaurant/id0000000000")}
         >
           <View style={styles.btnInner}>
             <Feather name="download" size={18} color={colors.primary} />
