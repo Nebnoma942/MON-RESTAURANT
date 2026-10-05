@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 export type DriverUser = { id:number; name:string; phone:string; email?:string|null; role:string; loyaltyPoints:number; createdAt:string };
-type AuthValue = { user:DriverUser|null; token:string|null; loading:boolean; login:(phone:string,password:string)=>Promise<void>; register:(name:string,phone:string,password:string)=>Promise<void>; logout:()=>Promise<void> };
+type AuthValue = { user:DriverUser|null; token:string|null; loading:boolean; login:(phone:string,password:string)=>Promise<void>; loginWithGoogle:(credential:string)=>Promise<void>; register:(name:string,phone:string,password:string)=>Promise<void>; logout:()=>Promise<void> };
 const C=createContext<AuthValue|null>(null);
 const TOKEN_KEY="eatbf_driver_token"; const USER_KEY="eatbf_driver_user";
 const API=(process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api").replace(/\/$/,"");
