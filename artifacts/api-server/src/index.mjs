@@ -28,39 +28,7 @@ function mapOrder(o){return{id:o.id,clientId:o.customer_id,restaurantId:o.restau
 async function me(req){const t=tok(req);if(!t)return null;const u=await sb("/auth/v1/user",{},t);const p=await sb("/rest/v1/profiles?id=eq."+enc(u.id)+"&select=*&limit=1",{},t);if(!p?.[0]||p[0].status!=="active")return null;return {id:u.id,role:p[0].role,profile:p[0],token:t}}
 const synthetic=p=>p.replace(/[^0-9+]/g,"")+"@auth.mon-restaurant.local";
 
-async function bootstrapAdminFromEnv(){
-  const email=process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
-  const password=process.env.BOOTSTRAP_ADMIN_PASSWORD;
-  const adminKey=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if(!email||!password||!adminKey)return;
-  try{
-    const adminFetch=async(path,opts={})=>{
-      const h=new Headers(opts.headers||{});
-      h.set("apikey",adminKey);
-      h.set("authorization","Bearer "+adminKey);
-      h.set("content-type","application/json");
-      const r=await fetch(SB+path,{...opts,headers:h});
-      const t=await r.text();let d=null;try{d=t?JSON.parse(t):null}catch{d=t}
-      if(!r.ok)throw new Error(d?.message||d?.error_description||d?.error||("Supabase HTTP "+r.status));
-      return d;
-    };
-    const admins=await adminFetch("/rest/v1/profiles?role=eq.admin&select=id");
-    for(const old of admins||[])await adminFetch("/rest/v1/profiles?id=eq."+enc(old.id),{method:"PATCH",body:JSON.stringify({status:"suspended"})});
 
-    const users=await adminFetch("/auth/v1/admin/users?per_page=1000&page=1");
-    const existing=(users?.users||[]).find(u=>(u.email||"").toLowerCase()===email);
-    let user;
-    if(existing){
-      user=(await adminFetch("/auth/v1/admin/users/"+enc(existing.id),{method:"PUT",body:JSON.stringify({email,password,email_confirm:true,user_metadata:{full_name:"MON RESTAURANT Administrateur",role:"admin"}})}));
-    }else{
-      user=await adminFetch("/auth/v1/admin/users",{method:"POST",body:JSON.stringify({email,password,email_confirm:true,user_metadata:{full_name:"MON RESTAURANT Administrateur",role:"admin"}})});
-    }
-    const id=user?.id||user?.user?.id;
-    if(!id)throw new Error("Admin user creation returned no user id");
-    await adminFetch("/rest/v1/profiles",{method:"POST",headers:{Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id,full_name:"MON RESTAURANT Administrateur",phone:null,role:"admin",status:"active"})});
-    console.log("Admin bootstrap completed");
-  }catch(e){console.error("Admin bootstrap failed:",e?.message||e);}
-}
 
 
 async function route(req,res){
@@ -90,4 +58,4 @@ async function route(req,res){
     return send(res,404,{error:"Route not found"});
   }catch(e){return send(res,400,{error:e?.message||String(e)});}
 }
-http.createServer(route).listen(PORT,"0.0.0.0",()=>{console.log("MON-RESTAURANT API listening on "+PORT);bootstrapAdminFromEnv();});
+http.createServer(route).listen(PORT,"0.0.0.0",()=>console.log("MON-RESTAURANT API listening on "+PORT));
