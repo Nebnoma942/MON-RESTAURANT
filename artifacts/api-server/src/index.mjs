@@ -28,6 +28,23 @@ function mapOrder(o){return{id:o.id,clientId:o.customer_id,restaurantId:o.restau
 async function me(req){const t=tok(req);if(!t)return null;const u=await sb("/auth/v1/user",{},t);const p=await sb("/rest/v1/profiles?id=eq."+enc(u.id)+"&select=*&limit=1",{},t);if(!p?.[0]||p[0].status!=="active")return null;return {id:u.id,role:p[0].role,profile:p[0],token:t}}
 const synthetic=p=>p.replace(/[^0-9+]/g,"")+"@auth.mon-restaurant.local";
 
+async function bootstrapAdminFromEnv(){
+  const email=process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
+  const password=process.env.BOOTSTRAP_ADMIN_PASSWORD;
+  if(!email||!password)return;
+  try{
+    let a;
+    try{
+      a=await sb("/auth/v1/token?grant_type=password",{method:"POST",body:JSON.stringify({email,password})});
+    }catch{
+      a=await sb("/auth/v1/signup",{method:"POST",body:JSON.stringify({email,password,data:{full_name:"MON RESTAURANT Administrateur",role:"admin"}})});
+    }
+    if(!a?.access_token||!a?.user?.id)throw new Error("Admin bootstrap requires a confirmed email or an existing valid account");
+    await sb("/rest/v1/profiles",{method:"POST",headers:{Prefer:"resolution=merge-duplicates"},body:JSON.stringify({id:a.user.id,full_name:"MON RESTAURANT Administrateur",phone:null,role:"admin",status:"active"})},a.access_token);
+    console.log("Admin bootstrap completed");
+  }catch(e){console.error("Admin bootstrap failed:",e?.message||e);}
+}
+
 
 async function route(req,res){
   if(req.method==="OPTIONS"){res.writeHead(204,{"access-control-allow-origin":ORIGINS[0]||"*","access-control-allow-headers":"authorization,content-type","access-control-allow-methods":"GET,POST,PATCH,OPTIONS"});return res.end();}
@@ -56,4 +73,4 @@ async function route(req,res){
     return send(res,404,{error:"Route not found"});
   }catch(e){return send(res,400,{error:e?.message||String(e)});}
 }
-http.createServer(route).listen(PORT,"0.0.0.0",()=>console.log("MON-RESTAURANT API listening on "+PORT));
+http.createServer(route).listen(PORT,"0.0.0.0",()=>{console.log("MON-RESTAURANT API listening on "+PORT);bootstrapAdminFromEnv();});
