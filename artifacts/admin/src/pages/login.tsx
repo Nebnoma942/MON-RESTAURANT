@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
-  phone: z.string().min(8, "Le numéro de téléphone doit comporter au moins 8 caractères"),
+  phone: z.string().email("Saisissez une adresse e-mail valide"),
   password: z.string().min(6, "Le mot de passe doit comporter au moins 6 caractères"),
 });
 
@@ -96,9 +96,9 @@ export default function Login() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone</FormLabel>
+                  <FormLabel>E-mail administrateur</FormLabel>
                   <FormControl>
-                    <Input placeholder="+226..." {...field} />
+                    <Input type="email" placeholder="adresse@exemple.com" autoComplete="username" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
