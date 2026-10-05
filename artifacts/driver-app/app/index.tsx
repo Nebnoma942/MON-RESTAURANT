@@ -18,7 +18,7 @@ export default function DriverHome(){
  const [busy,setBusy]=useState(false);
  const [authError,setAuthError]=useState("");
  const discovery=AuthSession.useAutoDiscovery("https://accounts.google.com");
- const redirectUri=AuthSession.makeRedirectUri({scheme:"monrestaurant"});
+ const redirectUri=AuthSession.makeRedirectUri({scheme:"mobile"});
  const [googleRequest,googleResponse,promptGoogle]=AuthSession.useAuthRequest({
    clientId:(process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || ""),
    webClientId:process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
