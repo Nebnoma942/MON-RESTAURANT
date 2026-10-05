@@ -1,6 +1,7 @@
 {
   "name": "@workspace/driver-app",
   "version": "0.0.0",
+  "description": "MON-RESTAURANT Driver App",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
