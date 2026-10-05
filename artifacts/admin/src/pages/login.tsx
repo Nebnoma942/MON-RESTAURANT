@@ -1,72 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginUser } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import GoogleSignIn from "@/components/GoogleSignIn";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const loginSchema = z.object({
-  phone: z.string().email("Saisissez une adresse e-mail valide"),
-  password: z.string().min(6, "Le mot de passe doit comporter au moins 6 caractères"),
-});
-
-type LoginValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { login, isAuthenticated } = useAuth();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const loginMutation = useLoginUser();
-
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      phone: "",
-      password: "",
-    },
-  });
-
   useEffect(() => {
-    if (isAuthenticated) {
-      setLocation("/dashboard");
-    }
+    if (isAuthenticated) setLocation("/dashboard");
   }, [isAuthenticated, setLocation]);
 
-  if (isAuthenticated) {
-    return null;
-  }
-
-  const onSubmit = (values: LoginValues) => {
-    setErrorMsg(null);
-    loginMutation.mutate({ data: values }, {
-      onSuccess: (res) => {
-        if (res.user.role !== "admin") {
-          setErrorMsg("Accès refusé — compte admin requis");
-          return;
-        }
-        login(res.token, res.user);
-        setLocation("/dashboard");
-      },
-      onError: () => {
-        setErrorMsg("Identifiants incorrects");
-      }
-    });
-  };
+  if (isAuthenticated) return null;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background">
@@ -89,46 +36,18 @@ export default function Login() {
           </Alert>
         )}
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail administrateur</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="adresse@exemple.com" autoComplete="username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <GoogleSignIn
+          onError={setErrorMsg}
+          onSuccess={(token, user) => {
+            setErrorMsg(null);
+            login(token, user);
+            setLocation("/dashboard");
+          }}
+        />
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Se connecter
-            </Button>
-          </form>
-        </Form>
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Sélectionnez votre compte Google autorisé pour continuer.
+        </p>
       </div>
     </div>
   );
