@@ -1,34 +1,12 @@
 import { useState } from "react";
-import { useLoginUser } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
+import GoogleSignIn from "@/components/GoogleSignIn";
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const [, navigate] = useLocation();
-
-  const loginMutation = useLoginUser({
-    mutation: {
-      onSuccess: (data) => {
-        if (data.user.role !== "restaurant_owner") {
-          setError("Accès réservé aux comptes restaurateur.");
-          return;
-        }
-        login(data.token, data.user);
-        navigate("/");
-      },
-      onError: () => setError("Téléphone ou mot de passe incorrect."),
-    },
-  });
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    loginMutation.mutate({ data: { phone, password } });
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -39,7 +17,7 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold text-foreground">MON RESTAURANT</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Espace Restaurateur — accès fourni par MON RESTAURANT
+            Espace Restaurateur — accès réservé aux comptes autorisés
           </p>
         </div>
 
@@ -49,37 +27,19 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Téléphone</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+226 XX XX XX XX"
-                required
-                className="w-full px-3 py-2.5 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Mot de passe</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-3 py-2.5 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loginMutation.isPending}
-              className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {loginMutation.isPending ? "Connexion..." : "Se connecter"}
-            </button>
-          </form>
+
+          <GoogleSignIn
+            onError={setError}
+            onSuccess={(token, user) => {
+              setError("");
+              login(token, user);
+              navigate("/");
+            }}
+          />
+
+          <p className="text-center text-xs text-muted-foreground mt-5">
+            Sélectionnez l'adresse Google associée à votre compte restaurateur.
+          </p>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
