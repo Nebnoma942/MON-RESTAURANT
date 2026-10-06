@@ -39,7 +39,7 @@ export default function GoogleSignIn({
         client_id: clientId,
         callback: async (response: { credential: string }) => {
           try {
-            const apiBase = ((import.meta.env.VITE_API_URL as string | undefined) || "/api").replace(/\/$/, "");
+            const apiBase = ((import.meta.env.VITE_API_URL as string | undefined) || "https://mon-restaurant-api-prod.onrender.com/api").replace(/\/$/, "");
             const result = await fetch(`${apiBase}/auth/google`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
